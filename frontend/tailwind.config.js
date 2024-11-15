@@ -4,9 +4,9 @@ export default {
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
+  darkMode: 'media', // hoặc 'class'
   theme: {
     extend: {},
   },
   plugins: [],
 }
-
