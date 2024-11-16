@@ -59,7 +59,16 @@ public class User {
 	
 	@OneToMany(mappedBy = "create_by", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Course> courses = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<CourseEnrollment> courseEnrollments = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notifications = new ArrayList<>();
+	
 	public User(UUID id, String firstName, String lastName, String avatar, Role role, String email, String password,
 			Date createdAt, Date updatedAt) {
 		super();
@@ -76,6 +85,30 @@ public class User {
 
 	public User() {
 		super();
+	}
+	
+	public List<Notification> getNotifications() {
+		return notifications;
+	}
+
+	public void setNotifications(List<Notification> notifications) {
+		this.notifications = notifications;
+	}
+
+	public List<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<Comment> comments) {
+		this.comments = comments;
+	}
+
+	public List<CourseEnrollment> getCourseEnrollments() {
+		return courseEnrollments;
+	}
+
+	public void setCourseEnrollments(List<CourseEnrollment> courseEnrollments) {
+		this.courseEnrollments = courseEnrollments;
 	}
 
 	public List<Course> getCourses() {

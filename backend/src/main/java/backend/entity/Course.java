@@ -1,8 +1,11 @@
 package backend.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -43,6 +47,21 @@ public class Course {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createdAt;
 	
+	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<CourseEnrollment> courseEnrollments = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Quiz> quizzes = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<QuizResult> quizResults = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Lecture> lectures = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Comment> comments = new ArrayList<>();
+	
 	@PrePersist
 	protected void onCreate() {
 	  createdAt = new Date();
@@ -62,6 +81,46 @@ public class Course {
 
 	public Course() {
 		super();
+	}
+	
+	public List<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<Comment> comments) {
+		this.comments = comments;
+	}
+
+	public List<Lecture> getLectures() {
+		return lectures;
+	}
+
+	public void setLectures(List<Lecture> lectures) {
+		this.lectures = lectures;
+	}
+
+	public List<QuizResult> getQuizResults() {
+		return quizResults;
+	}
+
+	public void setQuizResults(List<QuizResult> quizResults) {
+		this.quizResults = quizResults;
+	}
+
+	public List<Quiz> getQuizzes() {
+		return quizzes;
+	}
+
+	public void setQuizzes(List<Quiz> quizzes) {
+		this.quizzes = quizzes;
+	}
+
+	public List<CourseEnrollment> getCourseEnrollments() {
+		return courseEnrollments;
+	}
+
+	public void setCourseEnrollments(List<CourseEnrollment> courseEnrollments) {
+		this.courseEnrollments = courseEnrollments;
 	}
 
 	public UUID getId() {
