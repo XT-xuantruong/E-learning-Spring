@@ -14,9 +14,10 @@ import App from './App.vue'
 import router from './router'
 
 const app = createApp(App)
-app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(createPinia())
 app.use(router)
+
+app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(VueApexCharts)
 
 app.mount('#app')
