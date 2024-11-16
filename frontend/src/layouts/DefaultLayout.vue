@@ -19,8 +19,8 @@
 
 <script setup>
 import { ref } from 'vue';
-import Sidebar from '@/components/Sidebar/Sidebar.vue';
-import Header from '@/components/Header/Header.vue';
+import Sidebar from '@/components/admin/Sidebar/Sidebar.vue';
+import Header from '@/components/admin/Header/Header.vue';
 
 const toggleSidebar = () => {
   console.log('Toggle sidebar');

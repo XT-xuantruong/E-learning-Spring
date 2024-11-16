@@ -1,6 +1,6 @@
 <template>
   <aside
-    class="fixed top-0 left-0 w-64 h-full bg-slate-800 text-white shadow-lg"
+    class="fixed top-0 left-0 w-64 h-full bg-slate-800 text-emerald-400 shadow-lg"
   >
     <!-- Logo -->
     <div class="flex items-center gap-2 px-6 py-5 border-b border-slate-700">
@@ -17,10 +17,10 @@
       <div class="space-y-3">
         <!-- Dashboard -->
         <router-link
-          to="/"
+          to="/admin/"
           class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200"
           :class="[
-            $route.path === '/dashboard'
+            $route.path === 'admin/dashboard'
               ? 'bg-slate-700 text-emerald-400'
               : 'hover:bg-slate-700/50',
           ]"
@@ -52,7 +52,6 @@
               }"
             ></i>
           </button>
-
           <!-- Submenu -->
           <div
             v-show="
@@ -62,7 +61,7 @@
             class="pl-4 space-y-2"
           >
             <router-link
-              to="/courses/course-management"
+              to="/admin/courses/course-management"
               class="flex items-center px-4 py-2 rounded-lg transition-colors duration-200"
               :class="[
                 $route.path === '/courses/course-management'
@@ -75,7 +74,7 @@
             </router-link>
 
             <router-link
-              to="/courses/category-course"
+              to="/admin/courses/category-course"
               class="flex items-center px-4 py-2 rounded-lg transition-colors duration-200"
               :class="[
                 $route.path === '/courses/category-course'
@@ -87,7 +86,7 @@
               <span class="ml-3 text-sm font-medium">Category Course Management</span>
             </router-link>
             <router-link
-              to="/courses/lecture-management"
+              to="/admin/courses/lecture-management"
               class="flex items-center px-4 py-2 rounded-lg transition-colors duration-200"
               :class="[
                 $route.path === '/courses/lecture-management'
@@ -132,7 +131,7 @@
             class="pl-4 space-y-2"
           >
             <router-link
-              to="/quiz/quiz-list"
+              to="/admin/quiz/quiz-list"
               class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200"
               :class="[
                 $route.path === '/quiz-list'
@@ -145,7 +144,7 @@
             </router-link>
 
             <router-link
-              to="/quiz/question-answer-management"
+              to="/admin/quiz/question-answer-management"
               class="flex items-center px-4 py-2 rounded-lg transition-colors duration-200"
               :class="[
                 $route.path === 'quiz/question-answer-management'
@@ -158,7 +157,7 @@
             </router-link>
 
             <router-link
-              to="/quiz/scope-management"
+              to="/admin/quiz/scope-management"
               class="flex items-center px-4 py-2 rounded-lg transition-colors duration-200"
               :class="[
                 $route.path === '/quiz/scope-management'
@@ -174,7 +173,7 @@
 
         <!-- Review -->
         <router-link
-          to="/review"
+          to="/admin/review"
           class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200"
           :class="[
             $route.path === '/review'
@@ -219,7 +218,7 @@
             class="pl-4 space-y-2"
           >
             <router-link
-              to="/users/student-management"
+              to="/admin/users/student-management"
               class="flex items-center px-4 py-2 rounded-lg transition-colors duration-200"
               :class="[
                 $route.path === '/courses/course-management'
@@ -231,7 +230,7 @@
               <span class="ml-3 text-sm font-medium">Student Management</span>
             </router-link>
             <router-link
-              to="/users/teacher-management"
+              to="/admin/users/teacher-management"
               class="flex items-center px-4 py-2 rounded-lg transition-colors duration-200"
               :class="[
                 $route.path === '/users/teacher-management'
