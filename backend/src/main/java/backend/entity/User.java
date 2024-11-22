@@ -57,7 +57,7 @@ public class User {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date updatedAt;
 	
-	@OneToMany(mappedBy = "create_by", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "Create_by", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Course> courses = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
