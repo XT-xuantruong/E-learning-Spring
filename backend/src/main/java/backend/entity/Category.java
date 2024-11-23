@@ -1,37 +1,31 @@
 package backend.entity;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
+
 
 @Entity
 @Table(name = "category")
 public class Category {
 	
 	@Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 	
 	@Column(name = "title")
 	private String Title;
 	
-	@Column(name = "slug")
+	@Column(name = "slug",unique = true)
 	private String Slug;
 	
 	@OneToMany(mappedBy = "Category_id", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<Course> courses = new ArrayList<>();
 	
 	@Column(name = "created_at")
@@ -39,16 +33,49 @@ public class Category {
 	private Date createdAt;
 	
 	@PrePersist
-	protected void onCreate() {
-	  createdAt = new Date();
-	}
+    protected void onCreate() {
+        if (id == null || id.isEmpty()) {
+            id = UUID.randomUUID().toString();
+        }
+        createdAt = new Date();
+        generateSlug();
+    }
 
-	public Category(String title, String slug, List<Course> courses, Date createdAt) {
+    @PreUpdate
+    protected void onUpdate() {
+        generateSlug();
+    }
+	private void generateSlug() {
+        if (Title != null && !Title.isEmpty()) {
+            // Convert to lowercase
+            String slugValue = Title.toLowerCase();
+            
+            // Remove diacritical marks (accents)
+            slugValue = Normalizer.normalize(slugValue, Normalizer.Form.NFD)
+                    .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+            
+            // Replace spaces with hyphens
+            slugValue = slugValue.replaceAll("\\s+", "-");
+            
+            // Remove special characters
+            slugValue = slugValue.replaceAll("[^a-z0-9-]", "");
+            
+            // Remove multiple consecutive hyphens
+            slugValue = slugValue.replaceAll("-+", "-");
+            
+            // Remove leading and trailing hyphens
+            slugValue = slugValue.replaceAll("^-|-$", "");
+            
+            this.Slug = slugValue;
+        }
+    }
+
+	public Category(String id,String title, String slug, Date createdAt) {
 		super();
-		Title = title;
-		Slug = slug;
-		this.courses = courses;
-		this.createdAt = createdAt;
+		this.id = id;
+		this.Title = title;
+        this.Slug = slug;
+        this.createdAt = createdAt;
 	}
 
 	public Category() {
@@ -56,11 +83,11 @@ public class Category {
 	}
 	
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
