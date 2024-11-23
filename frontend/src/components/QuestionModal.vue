@@ -120,7 +120,7 @@
 
 <script setup>
 import { ref, onMounted, defineProps, defineEmits } from 'vue'
-import Modal from '@/components/Modal.vue'
+import Modal from '@/components/QuizModal.vue'
 import { read, utils } from 'xlsx'
 
 const props = defineProps({

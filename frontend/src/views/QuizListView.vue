@@ -153,6 +153,7 @@ const quizForm = reactive({
 });
 const isModalOpen = ref(false);
 const currentQuiz = ref(null);
+const searchQuery = ref("");
 
 // Computed properties
 const quizzesByCourseName = computed(() => {
@@ -163,6 +164,25 @@ const quizzesByCourseName = computed(() => {
     acc[quiz.course_name].push(quiz);
     return acc;
   }, {});
+});
+
+const filteredQuizzes = computed(() => {
+  const query = searchQuery.value.toLowerCase().trim();
+  if (!query) return quizzesByCourseName.value;
+
+  return Object.fromEntries(
+    Object.entries(quizzesByCourseName.value)
+      .map(([courseName, quizList]) => [
+        courseName,
+        quizList.filter(
+          (quiz) =>
+            quiz.title.toLowerCase().includes(query) ||
+            courseName.toLowerCase().includes(query) ||
+            quiz.id.toString().includes(query)
+        ),
+      ])
+      .filter(([, quizzes]) => quizzes.length > 0)
+  );
 });
 
 // CRUD operations
@@ -283,9 +303,18 @@ const closeModal = () => {
 
       <!-- Quiz list -->
       <div class="bg-white p-4 rounded shadow">
-        <h2 class="text-xl mb-3">Danh sách Quiz</h2>
+        <div class="flex justify-between">
+          <h2 class="text-xl mb-3">Danh sách Quiz</h2>
+          <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="Search..."
+            class="pl-10 pr-4 py-2 rounded-lg border border-gray-200"
+          />
+        </div>
+
         <div
-          v-for="(quizzesByCourse, courseName) in quizzesByCourseName"
+          v-for="(quizList, courseName) in filteredQuizzes"
           :key="courseName"
         >
           <h3 class="text-lg mb-2">{{ courseName }}</h3>
@@ -300,7 +329,7 @@ const closeModal = () => {
             </thead>
             <tbody>
               <tr
-                v-for="quiz in quizzesByCourse"
+                v-for="quiz in quizList"
                 :key="quiz.id"
                 class="border-b"
               >
@@ -311,7 +340,6 @@ const closeModal = () => {
                   <button
                     @click="editQuiz(quiz)"
                     class="mr-2 text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md hover:bg-indigo-100 transition-colors duration-200"
-
                   >
                     <font-awesome-icon :icon="['fas', 'pen']" />
                   </button>

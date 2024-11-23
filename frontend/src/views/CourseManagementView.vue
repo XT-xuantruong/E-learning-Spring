@@ -29,8 +29,22 @@
 
         <!-- Course List -->
         <div class="bg-white rounded-lg shadow overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
+          <div class="overflow-x-auto m-4">
+            <!-- Search Bar -->
+            <div class="hidden md:flex items-center">
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                  <i class="fas fa-search text-gray-400"></i>
+                </span>
+                <input
+                  type="text"
+                  v-model="searchQuery"
+                  placeholder="Search..."
+                  class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 "
+                />
+              </div>
+            </div>
+            <table class="min-w-full divide-y divide-gray-200 mt-3">
               <thead class="bg-gray-50">
                 <tr>
                   <th
@@ -62,7 +76,7 @@
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
                 <tr
-                  v-for="course in courses"
+                  v-for="course in filteredCourses"
                   :key="course.id"
                   class="hover:bg-gray-50"
                 >
@@ -89,14 +103,13 @@
                       @click="openEditModal(course)"
                       class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md hover:bg-indigo-100 transition-colors duration-200"
                     >
-                    <font-awesome-icon :icon="['fas', 'pen']" />
+                      <font-awesome-icon :icon="['fas', 'pen']" />
                     </button>
                     <button
                       @click="deleteCourse(course.id)"
                       class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md hover:bg-red-100 transition-colors duration-200"
                     >
-                    <font-awesome-icon :icon="['fas', 'trash']" />
-
+                      <font-awesome-icon :icon="['fas', 'trash']" />
                     </button>
                   </td>
                 </tr>
@@ -221,7 +234,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive, computed } from "vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 
 // Categories data
@@ -256,6 +269,7 @@ const showModal = ref(false);
 const isEditing = ref(false);
 const imagePreview = ref(null);
 const selectedFile = ref(null);
+const searchQuery = ref("");
 
 const formData = reactive({
   id: null,
@@ -263,6 +277,15 @@ const formData = reactive({
   description: "",
   thumbnail: "",
   category_id: "",
+});
+
+const filteredCourses = computed(() => {
+  const query = searchQuery.value.toLowerCase().trim();
+  if (!query) return courses.value;
+
+  return courses.value.filter((course) =>
+    course.title.toLowerCase().includes(query)
+  );
 });
 
 // Methods

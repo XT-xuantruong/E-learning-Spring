@@ -55,7 +55,7 @@
             <input
               type="text"
               v-model="searchQuery"
-              placeholder="Tìm kiếm danh mục..."
+              placeholder="Search..."
               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -323,8 +323,7 @@ const filteredCategories = computed(() => {
     const query = searchQuery.value.toLowerCase();
     result = result.filter(
       (category) =>
-        category.title.toLowerCase().includes(query) ||
-        category.slug.toLowerCase().includes(query)
+        category.title.toLowerCase().includes(query) 
     );
   }
 

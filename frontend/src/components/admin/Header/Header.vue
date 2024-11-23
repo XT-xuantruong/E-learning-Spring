@@ -11,19 +11,7 @@
           <i class="fas fa-bars text-lg"></i>
         </button>
         
-        <!-- Search Bar -->
-        <div class="hidden md:flex items-center">
-          <div class="relative">
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
-              <i class="fas fa-search text-gray-400"></i>
-            </span>
-            <input 
-              type="text" 
-              placeholder="Tìm kiếm..." 
-              class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent w-64"
-            >
-          </div>
-        </div>
+        
       </div>
       
       <!-- Right side -->
@@ -54,16 +42,7 @@
             v-if="isProfileOpen" 
             class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2"
           >
-            <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-600 hover:bg-gray-50">
-              <i class="fas fa-user w-4"></i>
-              <span>Hồ sơ</span>
-            </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-600 hover:bg-gray-50">
-              <i class="fas fa-cog w-4"></i>
-              <span>Cài đặt</span>
-            </a>
-            <hr class="my-2 border-gray-100">
-            <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-gray-50">
+                       <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-gray-50">
               <i class="fas fa-sign-out-alt w-4"></i>
               <span>Đăng xuất</span>
             </a>
