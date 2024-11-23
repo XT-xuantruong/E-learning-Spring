@@ -5,11 +5,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -23,8 +23,7 @@ import jakarta.persistence.TemporalType;
 @Table(name = "course")
 public class Course {
 	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
-	private UUID id;
+	private String id;
 	
 	@Column(name = "title")
 	private String Title;
@@ -48,26 +47,34 @@ public class Course {
 	private Date createdAt;
 	
 	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<CourseEnrollment> courseEnrollments = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<Quiz> quizzes = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<QuizResult> quizResults = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<Lecture> lectures = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<Comment> comments = new ArrayList<>();
 	
 	@PrePersist
 	protected void onCreate() {
-	  createdAt = new Date();
+		if (id == null || id.isEmpty()) {
+            id = UUID.randomUUID().toString();
+        }
+        createdAt = new Date();
 	}
 
-	public Course(UUID id, String title, String description, String thumbnail, Category category_id, User create_by,
+	public Course(String id, String title, String description, String thumbnail, Category category_id, User create_by,
 			Date createdAt) {
 		super();
 		this.id = id;
@@ -123,11 +130,11 @@ public class Course {
 		this.courseEnrollments = courseEnrollments;
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

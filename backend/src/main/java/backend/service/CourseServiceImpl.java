@@ -1,7 +1,6 @@
 package backend.service;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,7 @@ public class CourseServiceImpl implements CourseService{
 	}
 
 	@Override
-	public Course findById(UUID id) {
+	public Course findById(String id) {
 		return courseDAO.findById(id);
 	}
 
@@ -39,7 +38,7 @@ public class CourseServiceImpl implements CourseService{
 	}
 
 	@Override
-	public void deleteById(UUID id) {
+	public void deleteById(String id) {
 		courseDAO.deleteById(id);
 	}
 

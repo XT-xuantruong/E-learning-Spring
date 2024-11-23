@@ -1,7 +1,6 @@
 package backend.dao;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -27,7 +26,7 @@ public class CourseDAOImpl implements CourseDAO{
 
 	@Override
 	@Transactional
-	public Course findById(UUID id) {
+	public Course findById(String id) {
 		Session currentSession = sessionFactory.getCurrentSession();
         return currentSession.get(Course.class, id);
 	}
@@ -50,7 +49,7 @@ public class CourseDAOImpl implements CourseDAO{
 
 	@Override
 	@Transactional
-	public void deleteById(UUID id) {
+	public void deleteById(String id) {
 		Session currentSession = sessionFactory.getCurrentSession();
         Course theCourse = currentSession.get(Course.class, id);
         currentSession.remove(theCourse);
