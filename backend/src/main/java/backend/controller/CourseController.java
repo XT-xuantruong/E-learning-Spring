@@ -51,7 +51,7 @@ public class CourseController {
     	}
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(																																					)
     public ResponseEntity<ApiResponse<Course>> createCourse(
     		@RequestParam("title") String title,
     	    @RequestParam("description") String description,
