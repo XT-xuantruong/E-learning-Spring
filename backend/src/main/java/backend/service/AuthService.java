@@ -1,42 +1,15 @@
 package backend.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import backend.entity.User;
-import backend.dao.UserDAO;
-import backend.util.JwtUtil;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-@Service
-public class AuthService {
+import backend.entity.User;
 
-    @Autowired
-    private UserDAO userDAO;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    public Map<String, Object> login(User user) {
-        // Kiểm tra user trong database
-        User existingUser = userDAO.findByEmail(user.getEmail());
-
-        // Kiểm tra user tồn tại và mật khẩu đúng
-        if (existingUser == null || !existingUser.getPassword().equals(user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
-        }
-
-        // Tạo token
-        String accessToken = jwtUtil.generateAccessToken(existingUser);
-        String refreshToken = jwtUtil.generateRefreshToken(existingUser);
-
-        // Tạo response map
-        Map<String, Object> response = new HashMap<>();
-        response.put("accessToken", accessToken);
-        response.put("refreshToken", refreshToken);
-        response.put("email", existingUser.getEmail());
-        response.put("type", "Bearer");
-
-        return response;
-    }
+public interface AuthService {
+	public User findById(String id);
+	public User createUser(User user) ;
+	public Map<String, Object> login(String email, String password) ;
+	public void logout(String token) ;
+	List<User> getAllUsers();
+	User updateUser(String id, User user);
 }

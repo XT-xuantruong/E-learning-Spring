@@ -1,6 +1,7 @@
 package backend.entity;
 
 import java.nio.charset.StandardCharsets;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,8 +29,7 @@ import jakarta.persistence.TemporalType;
 @Table(name = "users")
 public class User {
 	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
-	private UUID id;
+	private String id;
 	
 	@Column(name = "first_name")
 	private String firstName;
@@ -40,7 +40,7 @@ public class User {
 	@Column(name = "avatar")    
 	private String avatar;
 	
-	@Enumerated(EnumType.STRING)
+	@Enumerated(EnumType.STRING) 
 	private Role role;
 	    
 	@Column(name = "email",unique = true)
@@ -57,19 +57,23 @@ public class User {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date updatedAt;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "Create_by", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Course> courses = new ArrayList<>();
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<CourseEnrollment> courseEnrollments = new ArrayList<>();
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notifications = new ArrayList<>();
 	
-	public User(UUID id, String firstName, String lastName, String avatar, Role role, String email, String password,
+	public User(String id, String firstName, String lastName, String avatar, Role role, String email, String password,
 			Date createdAt, Date updatedAt) {
 		super();
 		this.id = id;
@@ -115,15 +119,16 @@ public class User {
 		return courses;
 	}
 
+	
 	public void setCourses(List<Course> courses) {
 		this.courses = courses;
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -179,7 +184,10 @@ public class User {
 
 	@PrePersist
 	protected void onCreate() {
-	  createdAt =updatedAt = new Date();
+		if (id == null || id.isEmpty()) {
+            id = UUID.randomUUID().toString();
+        }
+        createdAt = new Date();
 	}
 
     @PreUpdate
