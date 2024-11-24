@@ -6,27 +6,27 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import backend.entity.Category;
-import backend.service.CategoryService;
+import backend.entity.Lecture;
+import backend.service.LectureService;
 import backend.util.ApiResponse;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/category")
-public class CategoryController {
+@RequestMapping("/api/lecture")
+public class LectureController {
 
     @Autowired
-    private CategoryService categoryService;
+    private LectureService lectureService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Category>>> getAllCategorys() {
+    public ResponseEntity<ApiResponse<List<Lecture>>> getAllCategorys() {
         try {
-        	List<Category> category = categoryService.readListCategory();
+        	List<Lecture> category = lectureService.readListLecture();
             if (category.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
-            ApiResponse<List<Category>> response = new ApiResponse<>("ok", "Successfully", category);
+            ApiResponse<List<Lecture>> response = new ApiResponse<>("ok", "Successfully", category);
             return ResponseEntity.ok(response);
         } catch(Exception e){
         	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -35,15 +35,15 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Category>> getCategoryById(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Lecture>> getLectureById(@PathVariable String id) {
     	try {
 
-    		Category category = categoryService.findById(id);
-    		System.out.print(category);
-            if (category == null) {
+    		Lecture lecture = lectureService.findById(id);
+    		System.out.print(lecture);
+            if (lecture == null) {
                 return ResponseEntity.notFound().build();
             }
-            ApiResponse<Category> response = new ApiResponse<>("ok", "Successfully", category);
+            ApiResponse<Lecture> response = new ApiResponse<>("ok", "Successfully", lecture);
             return ResponseEntity.ok(response);
     	} catch (Exception e) {
     		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -52,15 +52,17 @@ public class CategoryController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse<Category>> createCategory(
-    		@RequestParam("title") String title
+    public ResponseEntity<ApiResponse<Lecture>> createCategory(
+    		@RequestParam("title") String title,
+    		@RequestParam("content") String content
     	    ) {      
         try {
-        	Category category = new Category();
-        	category.setTitle(title);
-        	categoryService.createCategory(category);
-    		System.out.print(category);
-            ApiResponse<Category> response = new ApiResponse<>("ok", "Successfully", category);
+        	Lecture lecture = new Lecture();
+        	lecture.setTitle(title);
+        	lecture.setContent(content);
+        	lectureService.createLecture(lecture);
+    		System.out.print(lecture);
+            ApiResponse<Lecture> response = new ApiResponse<>("ok", "Successfully", lecture);
             return ResponseEntity.ok(response);
     	} catch (Exception e) {
     		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -70,21 +72,23 @@ public class CategoryController {
     }
 
     @PutMapping(value ="/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse<Category>> updateCategory(
+    public ResponseEntity<ApiResponse<Lecture>> updateCourse(
     		@PathVariable String id, 
-    		@RequestParam("title") String title
+    		@RequestParam("title") String title,
+    		@RequestParam("content") String content
     		){
         
         try {
-        	Category category = categoryService.findById(id);
-        	if (category == null) {
-        		ApiResponse<Category> response = new ApiResponse<>("error", "Not exists",null);
+        	Lecture lecture = lectureService.findById(id);
+        	if (lecture == null) {
+        		ApiResponse<Lecture> response = new ApiResponse<>("error", "Not exists",null);
                 return ResponseEntity.ok(response);
         	}
-        	category.setTitle(title);
-            categoryService.updateCategory(category);
-    		System.out.print(category);
-            ApiResponse<Category> response = new ApiResponse<>("ok", "Successfully",category);
+        	lecture.setTitle(title);
+        	lecture.setContent(content);
+        	lectureService.updateLecture(lecture);
+    		System.out.print(lecture);
+            ApiResponse<Lecture> response = new ApiResponse<>("ok", "Successfully",lecture);
             return ResponseEntity.ok(response);
     	} catch (Exception e) {
     		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -93,16 +97,16 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Category>> deleteCategory(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Lecture>> deleteLecture(@PathVariable String id) {
         try {
-        	Category category = categoryService.findById(id);
-        	if (category == null) {
-        		ApiResponse<Category> response = new ApiResponse<>("error", "Not exists",null);
+        	Lecture lecture = lectureService.findById(id);
+        	if (lecture == null) {
+        		ApiResponse<Lecture> response = new ApiResponse<>("error", "Not exists",null);
                 return ResponseEntity.ok(response);
         	}
-        	categoryService.deleteById(id);
-    		System.out.print(category);
-            ApiResponse<Category> response = new ApiResponse<>("ok", "Successfully", category);
+        	lectureService.deleteById(id);
+    		System.out.print(lecture);
+            ApiResponse<Lecture> response = new ApiResponse<>("ok", "Successfully", lecture);
             return ResponseEntity.ok(response);
     	} catch (Exception e) {
     		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
