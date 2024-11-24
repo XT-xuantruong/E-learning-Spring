@@ -9,41 +9,41 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import backend.entity.Quiz;
+import backend.entity.Question;
 
 @Repository
-public class QuizDAOImpl implements QuizDAO{
+public class QuestionDAOImpl implements QuestionDAO{
 	@Autowired
     private SessionFactory sessionFactory;
 
 	@Override
 	@Transactional	
-	public List<Quiz> readListQuiz() {
+	public List<Question> readListQuestion() {
 		Session currentSession = sessionFactory.getCurrentSession();
-        Query<Quiz> theQuery = currentSession.createQuery("FROM Quiz", Quiz.class);
+        Query<Question> theQuery = currentSession.createQuery("FROM Question", Question.class);
         return theQuery.getResultList();
 	}
 
 	@Override
 	@Transactional
-	public Quiz findById(String id) {
+	public Question findById(String id) {
 		Session currentSession = sessionFactory.getCurrentSession();
-        return currentSession.get(Quiz.class, id);
+        return currentSession.get(Question.class, id);
 	}
 
 	@Override
 	@Transactional
-	public void createQuiz(Quiz theQuiz) {
+	public void createQuestion(Question theQuestion) {
 		Session currentSession = sessionFactory.getCurrentSession();
-        currentSession.persist(theQuiz);
+        currentSession.persist(theQuestion);
 		
 	}
 
 	@Override
 	@Transactional
-	public void updateQuiz(Quiz theQuiz) {
+	public void updateQuestion(Question theQuestion) {
 		Session currentSession = sessionFactory.getCurrentSession();
-        currentSession.merge(theQuiz);
+        currentSession.merge(theQuestion);
 		
 	}
 
@@ -51,8 +51,8 @@ public class QuizDAOImpl implements QuizDAO{
 	@Transactional
 	public void deleteById(String id) {
 		Session currentSession = sessionFactory.getCurrentSession();
-		Quiz theQuiz = currentSession.get(Quiz.class, id);
-        currentSession.remove(theQuiz);
+		Question theQuestion = currentSession.get(Question.class, id);
+        currentSession.remove(theQuestion);
 		
 	}
 	

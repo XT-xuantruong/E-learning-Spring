@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -18,11 +19,10 @@ import jakarta.persistence.TemporalType;
 @Table(name = "quiz_result")
 public class QuizResult {
 	@Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
     @Column(name = "score", nullable = false)
-    private int score;
+    private float score;
 
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false)
@@ -36,11 +36,19 @@ public class QuizResult {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
+    @PrePersist
+	protected void onCreate() {
+		if (id == null || id.isEmpty()) {
+            id = UUID.randomUUID().toString();
+        }
+        createdAt = new Date();
+	}
+    
 	public QuizResult() {
 		super();
 	}
 
-	public QuizResult(UUID id, int score, Quiz quiz, Course course, Date createdAt) {
+	public QuizResult(String id, float score, Quiz quiz, Course course, Date createdAt) {
 		super();
 		this.id = id;
 		this.score = score;
@@ -49,19 +57,19 @@ public class QuizResult {
 		this.createdAt = createdAt;
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
-	public int getScore() {
+	public float getScore() {
 		return score;
 	}
 
-	public void setScore(int score) {
+	public void setScore(float score) {
 		this.score = score;
 	}
 
@@ -79,15 +87,6 @@ public class QuizResult {
 
 	public void setCourse(Course course) {
 		this.course = course;
-	}
-
-	public Date getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(Date createdAt) {
-		this.createdAt = createdAt;
-	}
-    
+	}  
     
 }

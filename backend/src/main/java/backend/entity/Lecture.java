@@ -26,10 +26,9 @@ public class Lecture {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "content", nullable = false)
     private String content;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = true)
     private Course course;

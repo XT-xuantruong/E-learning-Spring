@@ -30,7 +30,6 @@ public class Quiz {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = true)
     private Course course;
