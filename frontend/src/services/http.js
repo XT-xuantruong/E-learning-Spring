@@ -1,7 +1,8 @@
 import axios from "axios";
-import { useUserStore } from "@/stores/user";
+// import { useUserStore } from "@/stores/user";
 
-const APP_API_URL = "http://localhost:8092/api/";
+// const APP_API_URL = "http://localhost:8092/api/";
+const APP_API_URL = import.meta.env.VITE_API_URL;
 // const Cookie = require("js-cookie");
 export default class Http {
   constructor(status) {
@@ -14,11 +15,11 @@ export default class Http {
   }
 
   requestHandler(request) {
-    const state = useUserStore();
-    const { access } = state.user;
-    if (access && access.length !== 0) {
-      request.headers["Authorization"] = `Bearer ${access}`;
-    }
+    // const state = useUserStore();
+    // const { access } = state.user;
+    // if (access && access.length !== 0) {
+    //   request.headers["Authorization"] = `Bearer ${access}`;
+    // }
     return request;
   }
 
@@ -48,11 +49,11 @@ export default class Http {
   }
 
   renewToken() {
-    const state = useUserStore();
-    const { refresh } = state.user;
-    if (refresh) {
-      state.refreshToken;
-    }
+    // const state = useUserStore();
+    // const { refresh } = state.user;
+    // if (refresh) {
+    //   state.refreshToken;
+    // }
     return false;
   }
 }

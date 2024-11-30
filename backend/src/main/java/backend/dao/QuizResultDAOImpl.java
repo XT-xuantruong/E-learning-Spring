@@ -9,41 +9,41 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import backend.entity.Quiz;
+import backend.entity.QuizResult;
 
 @Repository
-public class QuizDAOImpl implements QuizDAO{
+public class QuizResultDAOImpl implements QuizResultDAO{
 	@Autowired
     private SessionFactory sessionFactory;
 
 	@Override
 	@Transactional	
-	public List<Quiz> readListQuiz() {
+	public List<QuizResult> readListQuizResult() {
 		Session currentSession = sessionFactory.getCurrentSession();
-        Query<Quiz> theQuery = currentSession.createQuery("FROM Quiz", Quiz.class);
+        Query<QuizResult> theQuery = currentSession.createQuery("FROM QuizResult", QuizResult.class);
         return theQuery.getResultList();
 	}
 
 	@Override
 	@Transactional
-	public Quiz findById(String id) {
+	public QuizResult findById(String id) {
 		Session currentSession = sessionFactory.getCurrentSession();
-        return currentSession.get(Quiz.class, id);
+        return currentSession.get(QuizResult.class, id);
 	}
 
 	@Override
 	@Transactional
-	public void createQuiz(Quiz theQuiz) {
+	public void createQuizResult(QuizResult theQuizResult) {
 		Session currentSession = sessionFactory.getCurrentSession();
-        currentSession.persist(theQuiz);
+        currentSession.persist(theQuizResult);
 		
 	}
 
 	@Override
 	@Transactional
-	public void updateQuiz(Quiz theQuiz) {
+	public void updateQuizResult(QuizResult theQuizResult) {
 		Session currentSession = sessionFactory.getCurrentSession();
-        currentSession.merge(theQuiz);
+        currentSession.merge(theQuizResult);
 		
 	}
 
@@ -51,8 +51,8 @@ public class QuizDAOImpl implements QuizDAO{
 	@Transactional
 	public void deleteById(String id) {
 		Session currentSession = sessionFactory.getCurrentSession();
-		Quiz theQuiz = currentSession.get(Quiz.class, id);
-        currentSession.remove(theQuiz);
+		QuizResult theQuizResult = currentSession.get(QuizResult.class, id);
+        currentSession.remove(theQuizResult);
 		
 	}
 	

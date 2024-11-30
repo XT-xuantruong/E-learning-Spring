@@ -5,12 +5,21 @@ import CourseCard from '@/components/course/CourseCard.vue';
 import DefaultLayout from '@/layouts/user/DefaultLayout.vue';
 import Slider from '@/components/slider/Slider.vue';
 import CategorySection from '@/components/category/CategorySection.vue';
-import courses from '@/faker/course';
+import categoryServices from '@/services/categoryServices';
 
-
-// Products data
-
-
+const categories = ref([])
+const fetchCategory = async () => {
+  await categoryServices.gets()
+    .then(response => {
+      categories.value = response.data.data
+    })
+    .catch(error => {
+      console.error(error)
+    })
+}
+onBeforeMount(() => {
+  fetchCategory()
+})
 // Instructors data
 const instructors = ref([
   {
@@ -149,7 +158,7 @@ const handleNewsletterSubmit = () => {
 <template>
   <DefaultLayout>
     <Slider />
-    <CategorySection />
+    <CategorySection :categories="categories" />
     <!-- Courses Grid -->
     <section class="py-16 container mx-auto px-4">
       <div class="flex justify-between items-center mb-12">

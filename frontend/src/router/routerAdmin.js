@@ -10,6 +10,7 @@ import LectureManagement from "@/views/LectureManagementView.vue";
 import StudentManagement from "@/views/StudentManagementView.vue";
 import TeacherManagement from "@/views/TeacherManagementView.vue";
 import Login from "@/views/LoginView.vue";
+import DashboardView from "@/views/DashboardView.vue";
 
 export const adminRoutes = [
   {
@@ -28,7 +29,7 @@ export const adminRoutes = [
       {
         path: "",
         name: "dashboard",
-        component: Dashboard,
+        component: DashboardView,
         meta: {
           title: "dashboard",
         },

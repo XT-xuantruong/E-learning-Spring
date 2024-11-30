@@ -9,41 +9,41 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import backend.entity.Quiz;
+import backend.entity.CourseEnrollment;
 
 @Repository
-public class QuizDAOImpl implements QuizDAO{
+public class CourseEnrollmentImpl implements CourseEnrollmentDAO{
 	@Autowired
     private SessionFactory sessionFactory;
 
 	@Override
 	@Transactional	
-	public List<Quiz> readListQuiz() {
+	public List<CourseEnrollment> readListCourseEnrollment() {
 		Session currentSession = sessionFactory.getCurrentSession();
-        Query<Quiz> theQuery = currentSession.createQuery("FROM Quiz", Quiz.class);
+        Query<CourseEnrollment> theQuery = currentSession.createQuery("FROM CourseEnrollment", CourseEnrollment.class);
         return theQuery.getResultList();
 	}
 
 	@Override
 	@Transactional
-	public Quiz findById(String id) {
+	public CourseEnrollment findById(String id) {
 		Session currentSession = sessionFactory.getCurrentSession();
-        return currentSession.get(Quiz.class, id);
+        return currentSession.get(CourseEnrollment.class, id);
 	}
 
 	@Override
 	@Transactional
-	public void createQuiz(Quiz theQuiz) {
+	public void createCourseEnrollment(CourseEnrollment theCourseEnrollment) {
 		Session currentSession = sessionFactory.getCurrentSession();
-        currentSession.persist(theQuiz);
+        currentSession.persist(theCourseEnrollment);
 		
 	}
 
 	@Override
 	@Transactional
-	public void updateQuiz(Quiz theQuiz) {
+	public void updateCourseEnrollment(CourseEnrollment theCourseEnrollment) {
 		Session currentSession = sessionFactory.getCurrentSession();
-        currentSession.merge(theQuiz);
+        currentSession.merge(theCourseEnrollment);
 		
 	}
 
@@ -51,8 +51,8 @@ public class QuizDAOImpl implements QuizDAO{
 	@Transactional
 	public void deleteById(String id) {
 		Session currentSession = sessionFactory.getCurrentSession();
-		Quiz theQuiz = currentSession.get(Quiz.class, id);
-        currentSession.remove(theQuiz);
+        CourseEnrollment theCourseEnrollment = currentSession.get(CourseEnrollment.class, id);
+        currentSession.remove(theCourseEnrollment);
 		
 	}
 	

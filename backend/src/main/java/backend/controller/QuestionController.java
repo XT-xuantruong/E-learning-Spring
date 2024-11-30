@@ -6,32 +6,32 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import backend.entity.Course;
+import backend.entity.Question;
 import backend.entity.Quiz;
-import backend.service.CourseService;
+import backend.service.QuestionService;
 import backend.service.QuizService;
 import backend.util.ApiResponse;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/quiz")
-public class QuizController {
+@RequestMapping("/api/question")
+public class QuestionController {
 
+    @Autowired
+    private QuestionService questionService;
+    
     @Autowired
     private QuizService quizService;
     
-    @Autowired
-    private CourseService courseService;
-
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Quiz>>> getAllQuiz() {
+    public ResponseEntity<ApiResponse<List<Question>>> getAllQuestion() {
         try {
-        	List<Quiz> quiz = quizService.readListQuiz();
+        	List<Question> quiz = questionService.readListQuestion();
             if (quiz.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
-            ApiResponse<List<Quiz>> response = new ApiResponse<>("ok", "Successfully", quiz);
+            ApiResponse<List<Question>> response = new ApiResponse<>("ok", "Successfully", quiz);
             return ResponseEntity.ok(response);
         } catch(Exception e){
         	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -40,15 +40,14 @@ public class QuizController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Quiz>> getQuizById(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Question>> getQuestionById(@PathVariable String id) {
     	try {
 
-    		Quiz quiz = quizService.findById(id);
-    		System.out.print(quiz);
-            if (quiz == null) {
+    		Question q = questionService.findById(id);
+            if (q == null) {
                 return ResponseEntity.notFound().build();
             }
-            ApiResponse<Quiz> response = new ApiResponse<>("ok", "Successfully", quiz);
+            ApiResponse<Question> response = new ApiResponse<>("ok", "Successfully", q);
             return ResponseEntity.ok(response);
     	} catch (Exception e) {
     		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -57,17 +56,17 @@ public class QuizController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse<Quiz>> createQuiz(
-    		@RequestParam("title") String title,
-    		@RequestParam("course") String course
+    public ResponseEntity<ApiResponse<Question>> createQuestion(
+    		@RequestParam("question_text") String question_text,
+    		@RequestParam("quiz") String quiz
     	    ) {      
         try {
-        	Quiz quiz = new Quiz();
-        	quiz.setTitle(title);
-        	Course c = courseService.findById(course);
-        	quiz.setCourse(c);
-        	quizService.createQuiz(quiz);
-            ApiResponse<Quiz> response = new ApiResponse<>("ok", "Successfully", quiz);
+        	Question question = new Question();
+        	question.setQuestionText(question_text);
+        	Quiz q = quizService.findById(quiz);
+        	question.setQuiz(q);
+        	questionService.createQuestion(question);;
+            ApiResponse<Question> response = new ApiResponse<>("ok", "Successfully", question);
             return ResponseEntity.ok(response);
     	} catch (Exception e) {
     		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -77,28 +76,28 @@ public class QuizController {
     }
 
     @PutMapping(value ="/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse<Quiz>> updateQuiz(
+    public ResponseEntity<ApiResponse<Question>> updateQuiz(
     		@PathVariable String id, 
-    		@RequestParam(value="title",required=false) String title,
-    		@RequestParam(value="course",required=false) String course
+    		@RequestParam(value="question_text",required=false) String question_text,
+    		@RequestParam(value="quiz",required=false) String quiz
     		){
         
         try {
-        	Quiz quiz = quizService.findById(id);
-        	if (quiz == null) {
-        		ApiResponse<Quiz> response = new ApiResponse<>("error", "Not exists",null);
+        	Question question = questionService.findById(id);
+        	if (question == null) {
+        		ApiResponse<Question> response = new ApiResponse<>("error", "Not exists",null);
                 return ResponseEntity.ok(response);
         	}
-        	if(title != null) {
-        		quiz.setTitle(title);
+        	if(question_text != null) {
+        		question.setQuestionText(question_text);
         	}
-        	if(course!=null) {
-        		Course c = courseService.findById(course);
-            	quiz.setCourse(c);
+        	if(quiz!=null) {
+        		Quiz q = quizService.findById(quiz);
+        		question.setQuiz(q);
         	}
-            quizService.updateQuiz(quiz);
+        	questionService.updateQuestion(question);
 
-            ApiResponse<Quiz> response = new ApiResponse<>("ok", "Successfully", quiz);
+            ApiResponse<Question> response = new ApiResponse<>("ok", "Successfully", question);
             return ResponseEntity.ok(response);
     	} catch (Exception e) {
     		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -107,16 +106,15 @@ public class QuizController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Quiz>> deleteQuiz(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Question>> deleteCategory(@PathVariable String id) {
         try {
-        	Quiz quiz = quizService.findById(id);
-        	if (quiz == null) {
-        		ApiResponse<Quiz> response = new ApiResponse<>("error", "Not exists",null);
+        	Question question = questionService.findById(id);
+        	if (question == null) {
+        		ApiResponse<Question> response = new ApiResponse<>("error", "Not exists",null);
                 return ResponseEntity.ok(response);
         	}
-        	quizService.deleteById(id);
-    		System.out.print(quiz);
-            ApiResponse<Quiz> response = new ApiResponse<>("ok", "Successfully", quiz);
+        	questionService.deleteById(id);
+            ApiResponse<Question> response = new ApiResponse<>("ok", "Successfully", question);
             return ResponseEntity.ok(response);
     	} catch (Exception e) {
     		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

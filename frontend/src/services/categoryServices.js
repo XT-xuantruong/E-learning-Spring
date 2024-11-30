@@ -1,4 +1,4 @@
-import { useAdminStore } from "@/stores/admin";
+// import { useAdminStore } from "@/stores/admin";
 import ApiService from "./ApiService";
 
 class CategoryServices extends ApiService {
@@ -6,14 +6,14 @@ class CategoryServices extends ApiService {
     return "category";
   }
   async create(data) {
-    const adminStore = useAdminStore();
+    // const adminStore = useAdminStore();
     return this.request({
       method: "post",
       url: `/${this.entity}/`,
       data: data,
-      headers: {
-        Authorization: `Bearer ${adminStore.admin.access}`,
-      },
+      // headers: {
+      //   Authorization: `Bearer ${adminStore.admin.access}`,
+      // },
     });
   }
   async update(data) {
