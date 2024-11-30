@@ -43,7 +43,9 @@ CREATE TABLE course (
 
 ALTER TABLE course 
 ADD COLUMN price FLOAT NOT NULL DEFAULT 0.0;
-select * from category where slug = react-js; 
+ALTER TABLE course_enrollment 
+ADD COLUMN price FLOAT NOT NULL DEFAULT 0.0;
+select * from category where slug = "react-js"; 
 CREATE TABLE course_enrollment (
     id VARCHAR(36) PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,

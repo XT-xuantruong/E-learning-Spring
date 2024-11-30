@@ -32,6 +32,9 @@ public class CourseEnrollment {
     @Column(name = "enroll_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date enrollAt;
+    
+    @Column(name = "price")
+	private Float price;
 
     @Column(name = "is_paid", nullable = false)
     private boolean isPaid;
@@ -52,19 +55,31 @@ public class CourseEnrollment {
         }
         enrollAt = new Date();
     }
-    
 
-	public CourseEnrollment(String id, User user, Course course, Date enrollAt, boolean isPaid) {
+	public CourseEnrollment() {
+		super();
+	}
+
+	public CourseEnrollment(String id, User user, Course course, Date enrollAt, Float price, boolean isPaid,
+			boolean isFinish, String lastLecture, String lastquiz) {
 		super();
 		this.id = id;
 		this.user = user;
 		this.course = course;
 		this.enrollAt = enrollAt;
+		this.price = price;
 		this.isPaid = isPaid;
+		this.isFinish = isFinish;
+		this.lastLecture = lastLecture;
+		this.lastquiz = lastquiz;
+	}
+	
+	public Float getPrice() {
+		return price;
 	}
 
-	public CourseEnrollment() {
-		super();
+	public void setPrice(Float price) {
+		this.price = price;
 	}
 
 	public String getId() {

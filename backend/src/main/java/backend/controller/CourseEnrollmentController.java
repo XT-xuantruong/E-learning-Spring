@@ -1,6 +1,7 @@
 package backend.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ import backend.service.CourseService;
 import backend.service.CourseEnrollmentService;
 import backend.util.ApiResponse;
 
-
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/courseEnrollment")
 public class CourseEnrollmentController {
@@ -69,24 +70,25 @@ public class CourseEnrollmentController {
     	}
     }
 
-    @PostMapping(																																					)
+    @PostMapping()
     public ResponseEntity<ApiResponse<CourseEnrollment>> createCourseEnrollment(
-    		@RequestParam("user") String user,
-    	    @RequestParam("course") String course,
-    	    @RequestParam("isPaid") String  isPaid
+    		@RequestBody Map<String, String> payload
     ) {
         
         try {
-            CourseEnrollment courseEnrollment = new CourseEnrollment();
-            
-            User u = userService.findById(user);
+        	CourseEnrollment courseEnrollment = new CourseEnrollment();
+
+            String userId = payload.get("user");
+            User u = userService.findById(userId);
             courseEnrollment.setUser(u);
-            
-            Course c = courseService.findById(course);
+
+            String courseId = payload.get("course");
+            Course c = courseService.findById(courseId);
             courseEnrollment.setCourse(c);
-            
-        	courseEnrollment.setPaid(Boolean.parseBoolean(isPaid));;
-            
+
+            courseEnrollment.setPrice(Float.parseFloat(payload.get("price")));
+            courseEnrollment.setPaid(Boolean.parseBoolean(payload.get("isPaid")));
+
             courseEnrollmentService.createCourseEnrollment(courseEnrollment);
 
             ApiResponse<CourseEnrollment> response = new ApiResponse<>("ok", "Successfully", courseEnrollment);

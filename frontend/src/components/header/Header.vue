@@ -67,10 +67,11 @@
 
         <!-- Auth Buttons -->
         <div v-if="!userStore.user.isAuthenticated" class="flex items-center space-x-4">
-          <button class="px-4 py-2 text-blue-600 hover:text-blue-700 transition-colors">
+          <button @click="handleLogin" class="px-4 py-2 text-blue-600 hover:text-blue-700 transition-colors">
             Đăng nhập
           </button>
-          <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+          <button @click="handleSignup"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
             Đăng ký
           </button>
         </div>
@@ -79,8 +80,8 @@
         <div v-else class="relative">
           <button @click="toggleDropdown" class="flex items-center space-x-2 focus:outline-none">
             <img :src="userStore.user.avatar
-                ? 'http://127.0.0.1:8088' + userStore.user.avatar
-                : 'https://i.pinimg.com/1200x/bc/43/98/bc439871417621836a0eeea768d60944.jpg'
+              ? 'http://127.0.0.1:8092' + userStore.user.avatar
+              : 'https://i.pinimg.com/1200x/bc/43/98/bc439871417621836a0eeea768d60944.jpg'
               " alt="User avatar" class="w-8 h-8 rounded-full object-cover border-2 border-indigo-600" />
             <svg :class="{ 'rotate-180': isDropdownOpen }" class="w-4 h-4 transition-transform duration-200" fill="none"
               stroke="currentColor" viewBox="0 0 24 24">
@@ -209,7 +210,13 @@ const handleLogout = async () => {
   router.push("/signin");
 };
 
-console.log("long", userStore.user);
+const handleLogin = () => {
+  router.push({ name: "signin" });
+};
+
+const handleSignup = () => {
+  router.push({ name: "signup" });
+};
 </script>
 
 <style scoped>

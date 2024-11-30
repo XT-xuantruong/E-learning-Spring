@@ -1,10 +1,12 @@
 <template>
-    <RouterLink :to="{ name: 'course-detail', query: { course: course.id } }"
+    <div
         class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 h-[480px] flex flex-col">
-        <div class="h-48 w-full flex-shrink-0">
-            <img :src="'http://localhost:8092/backend' + course.thumbnail" :alt="course.title"
-                class="w-full h-full object-cover" />
-        </div>
+        <RouterLink :to="{ name: 'course-detail', query: { course: course.id } }">
+            <div class="h-48 w-full flex-shrink-0">
+                <img :src="'http://localhost:8092/backend' + course.thumbnail" :alt="course.title"
+                    class="w-full h-full object-cover" />
+            </div>
+        </RouterLink>
 
         <div class="p-6 flex flex-col flex-grow">
             <div class="flex-grow">
@@ -15,20 +17,22 @@
 
             <div class="mt-4 flex items-center justify-between border-t pt-4">
                 <p class="text-xl font-bold">{{ formatPrice(course.price) }}</p>
-                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                <button @click="proceedToCheckout"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                     Đăng ký
                 </button>
             </div>
         </div>
-    </RouterLink>
+    </div>
 </template>
 
 <script setup>
-import { defineProps, onBeforeMount } from 'vue'
-import { RouterLink } from 'vue-router';
-import categories from '@/faker/categories';
-import categoryServices from '@/services/categoryServices';
+import { defineProps } from 'vue';
+import { useRouter } from 'vue-router';
+import { useOrderStore } from '@/stores/order';
 
+const router = useRouter();
+const orderStore = useOrderStore();
 const props = defineProps({
     course: {
         type: Object,
@@ -36,24 +40,16 @@ const props = defineProps({
     }
 });
 
+const proceedToCheckout = () => {
+    console.log("Proceeding to checkout with items:", props.course);
+    orderStore.addItem(props.course);  // Thêm khóa học vào giỏ hàng
+    router.push("/checkout");  // Chuyển hướng đến trang thanh toán
+};
+
 const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', {
         style: 'currency',
         currency: 'VND'
     }).format(price);
 };
-// console.log(props.course.category_id);
-
-// const fetchCategory = async () => {
-//     await categoryServices.get(props.course.category_id)
-//         .then(response => {
-//             category.value = response.data.data
-//         })
-//         .catch(error => {
-//             console.error(error)
-//         })
-// }
-// onBeforeMount(() => {
-//     fetchCategory()
-// })
 </script>
