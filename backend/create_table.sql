@@ -41,6 +41,9 @@ CREATE TABLE course (
 	FOREIGN KEY (create_by) REFERENCES users(id)
 );
 
+ALTER TABLE course 
+ADD COLUMN price FLOAT NOT NULL DEFAULT 0.0;
+
 CREATE TABLE course_enrollment (
     id VARCHAR(36) PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,

@@ -6,8 +6,19 @@ import DefaultLayout from '@/layouts/user/DefaultLayout.vue';
 import Slider from '@/components/slider/Slider.vue';
 import CategorySection from '@/components/category/CategorySection.vue';
 import categoryServices from '@/services/categoryServices';
+import courseServices from '@/services/courseServices';
 
 const categories = ref([])
+const courseList = ref([])
+const fetchCourse = async () => {
+  await courseServices.gets()
+    .then(response => {
+      courseList.value = response.data.data
+    })
+    .catch(error => {
+      console.error(error)
+    })
+}
 const fetchCategory = async () => {
   await categoryServices.gets()
     .then(response => {
@@ -18,6 +29,7 @@ const fetchCategory = async () => {
     })
 }
 onBeforeMount(() => {
+  fetchCourse()
   fetchCategory()
 })
 // Instructors data
@@ -169,7 +181,7 @@ const handleNewsletterSubmit = () => {
         </a>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <CourseCard v-for="course in courses" :key="course.id" :course="course" />
+        <CourseCard v-for="course in courseList" :key="course.id" :course="course" />
       </div>
     </section>
     <!-- Instructors -->

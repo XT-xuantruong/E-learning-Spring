@@ -21,6 +21,9 @@ public class Course {
 	@Column(name = "description")
 	private String Description;
 	
+	@Column(name = "price")
+	private Float price;
+	
 	@Column(name = "thumbnail")
 	private String Thumbnail;
 	
@@ -60,21 +63,39 @@ public class Course {
         createdAt = new Date();
 	}
 
-	public Course(String id, String title, String description, String thumbnail, Category category_id, User create_by,
-			Date createdAt) {
-		super();
-		this.id = id;
-		Title = title;
-		Description = description;
-		Thumbnail = thumbnail;
-		Category_id = category_id;
-		Create_by = create_by;
-		this.createdAt = createdAt;
-	}
+	
 
 	public Course() {
 		super();
 	}
+
+
+
+	public Course(String id, String title, String description, Float price, String thumbnail, Category category_id,
+			User create_by) {
+		super();
+		this.id = id;
+		Title = title;
+		Description = description;
+		this.price = price;
+		Thumbnail = thumbnail;
+		Category_id = category_id;
+		Create_by = create_by;
+	}
+
+
+
+	public Float getPrice() {
+		return price;
+	}
+
+
+
+	public void setPrice(Float price) {
+		this.price = price;
+	}
+
+
 
 	public List<Lecture> getLectures() {
 		return lectures;

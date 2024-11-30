@@ -62,7 +62,7 @@ export default class ApiService {
   async get(id) {
     return this.request({
       method: "get",
-      url: `/${this.entity}/${id}/`,
+      url: `/${this.entity}/${id}`,
     });
   }
 

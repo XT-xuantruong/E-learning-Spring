@@ -12,15 +12,15 @@ import backend.util.ApiResponse;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/category")
-
 public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
     
-//    @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+    
     @GetMapping
     public ResponseEntity<ApiResponse<List<Category>>> getAllCategorys() {
         try {

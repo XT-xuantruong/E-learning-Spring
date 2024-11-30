@@ -78,7 +78,8 @@ public class CourseController {
     	    @RequestParam("description") String description,
     	    @RequestParam("thumbnail") MultipartFile  thumbnail,
     	    @RequestParam("createBy") String createBy,
-    	    @RequestParam("category") String category
+    	    @RequestParam("category") String category,
+    	    @RequestParam("price") String price
     ) {
         
         try {
@@ -105,6 +106,8 @@ public class CourseController {
             
             Category cate = categoryService.findById(category);
             course.setCategory_id(cate);
+            
+            course.setPrice(Float.parseFloat(price));
             
         	courseService.createCourse(course);
 
