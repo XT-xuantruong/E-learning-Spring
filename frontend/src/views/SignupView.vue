@@ -274,7 +274,7 @@ const onSubmit = async (values) => {
             <!-- Login Link -->
             <p class="text-center text-gray-600 mt-4">
                 Already have an account?
-                <RouterLink to="/login" class="text-blue-500 font-bold hover:underline">
+                <RouterLink to="/signin" class="text-blue-500 font-bold hover:underline">
                     Log in here
                 </RouterLink>
             </p>

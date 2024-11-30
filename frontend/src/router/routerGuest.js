@@ -8,6 +8,7 @@ import QuizView from "@/views/QuizView.vue";
 import MyAccountView from "@/views/MyAccountView.vue";
 import CheckoutView from "@/views/CheckoutView.vue";
 import SignupView from "@/views/SignupView.vue";
+import SigninView from "@/views/SigninView.vue";
 
 export const publicRoutes = [
   {
@@ -54,5 +55,10 @@ export const publicRoutes = [
     path: "/signup",
     name: "signup",
     component: SignupView,
+  },
+  {
+    path: "/signin",
+    name: "signin",
+    component: SigninView,
   },
 ];

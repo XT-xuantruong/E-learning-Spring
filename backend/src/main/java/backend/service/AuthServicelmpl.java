@@ -40,8 +40,8 @@ public class AuthServicelmpl implements AuthService  {
 
             Map<String, Object> response = new HashMap<>();
             response.put("user", user);
-            response.put("accessToken", accessToken);
-            response.put("refreshToken", refreshToken);
+            response.put("access_token", accessToken);
+            response.put("refresh_token", refreshToken);
 
             return response;
         }
