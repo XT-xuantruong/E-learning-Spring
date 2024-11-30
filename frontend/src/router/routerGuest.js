@@ -7,6 +7,7 @@ import StudyView from "@/views/StudyView.vue";
 import QuizView from "@/views/QuizView.vue";
 import MyAccountView from "@/views/MyAccountView.vue";
 import CheckoutView from "@/views/CheckoutView.vue";
+import SignupView from "@/views/SignupView.vue";
 
 
 
@@ -51,6 +52,11 @@ export const publicRoutes = [
       path: "/checkout",
       name: "checkout",
       component: CheckoutView,
+    },
+    {
+      path: "/signup",
+      name: "signup",
+      component: SignupView,
     },
 
 ]

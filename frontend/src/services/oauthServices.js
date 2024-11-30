@@ -20,18 +20,20 @@ class OauthServices extends ApiService {
     });
   }
   async signup(credential) {
-    const { name, email, password, confirmPassword, phone } = credential;
+    const { firstName, LastName, email, password, confirmPassword, phone, role } = credential;
     var data = {
-      name: name,
+      firstName: firstName,
+      LastName: LastName,
       email: email,
       password: password,
       confirmPassword: confirmPassword,
       phone: phone,
+      role: role
     };
     console.log(data);
     return this.request({
       method: "post",
-      url: `/${this.entity}/sign-up/`,
+      url: `/${this.entity}/register`,
       data: data,
     });
   }
