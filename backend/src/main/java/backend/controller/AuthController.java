@@ -17,7 +17,7 @@ import java.util.Map;
 import backend.entity.Role; 
 
 @RestController
-@RequestMapping("/api/users") 
+@RequestMapping("/api/user") 
 @CrossOrigin
 public class AuthController {
 
@@ -54,6 +54,7 @@ public class AuthController {
 	            user.setRole(role);
 	            user.setEmail(email);
 	            user.setPassword(hashPassword(password));
+	            System.out.print(user);
 	            
 	            User createdUser = authService.createUser(user);
 	            return ResponseEntity.ok(new ApiResponse<>("ok", "Successfully created user", createdUser));
