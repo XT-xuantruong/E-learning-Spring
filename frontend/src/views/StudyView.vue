@@ -11,8 +11,8 @@
             </div>
 
             <!-- Lessons List Section -->
-            <LessonsList :lessons="lessons" :currentIndex="currentIndex" :completedLessons="completedLessons"
-                @select-lesson="selectPdf" />
+            <LessonsList :quizs="quizInCourse" :lessons="lessons" :currentIndex="currentIndex"
+                :completedLessons="completedLessons" @select-lesson="selectPdf" />
         </div>
     </DefaultLayout>
 </template>
@@ -28,12 +28,14 @@ import PdfViewer from '@/components/pdf/PdfViewer.vue';
 import LessonsList from '@/components/course/LessonsList.vue';
 import courseServices from '@/services/courseServices';
 import lectureServices from '@/services/lectureServices';
+import quizServices from '@/services/quizServices';
 
 // Router setup
 const route = useRoute();
 const router = useRouter();
 const courseId = route.query.course
 const lectures = ref([])
+const quizs = ref([])
 const currentCourse = ref({})
 // Lấy danh sách bài giảng của khóa học
 const lessons = computed(() => {
@@ -42,10 +44,25 @@ const lessons = computed(() => {
         .filter(lecture => lecture.course.id == courseId)
         .sort((a, b) => a.title.localeCompare(b.title));
 })
+const quizInCourse = computed(() => {
+
+    return quizs.value = quizs.value
+        .filter(quiz => quiz.course.id == courseId)
+        .sort((a, b) => a.title.localeCompare(b.title));
+})
 const fetchCourse = async () => {
     await courseServices.get(courseId)
         .then(response => {
             currentCourse.value = response.data.data
+        })
+        .catch(error => {
+            console.error(error)
+        })
+}
+const fetchQuiz = async () => {
+    await quizServices.gets()
+        .then(response => {
+            quizs.value = response.data.data
         })
         .catch(error => {
             console.error(error)
@@ -63,7 +80,7 @@ const fetchLecture = async () => {
 onBeforeMount(() => {
     fetchCourse()
     fetchLecture()
-    // fetchCategory()
+    fetchQuiz()
 })
 // State
 const currentIndex = ref(-1);
@@ -75,6 +92,7 @@ const completedLessons = ref(2);
 const findLessonIndex = (lessonId) => {
     return lessons.value.findIndex(lesson => lesson.id == lessonId);
 };
+
 
 // Lifecycle hooks
 onMounted(() => {

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import backend.entity.Answer;
 import backend.entity.Question;
 
 @Repository
@@ -54,6 +55,15 @@ public class QuestionDAOImpl implements QuestionDAO{
 		Question theQuestion = currentSession.get(Question.class, id);
         currentSession.remove(theQuestion);
 		
+	}
+
+	@Override
+	@Transactional
+	public List<Answer> getAnswers(String id) {
+		Session currentSession = sessionFactory.getCurrentSession();
+        Query<Answer> theQuery = currentSession.createQuery("FROM Answer where question.id= :id", Answer.class);
+        theQuery.setParameter("id", id);
+        return theQuery.getResultList();
 	}
 	
 }

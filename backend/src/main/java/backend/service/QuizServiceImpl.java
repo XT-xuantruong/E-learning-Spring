@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import backend.dao.QuizDAO;
+import backend.dto.QuizDetailsDTO;
+import backend.dto.QuizMapper;
 import backend.entity.Quiz;
 
 @Service
@@ -14,6 +16,9 @@ import backend.entity.Quiz;
 public class QuizServiceImpl implements QuizService{
 	@Autowired
     private QuizDAO quizDAO;
+	
+	@Autowired
+    private QuizMapper quizMapper;
 
 	@Override
 	public List<Quiz> readListQuiz() {
@@ -39,5 +44,10 @@ public class QuizServiceImpl implements QuizService{
 	public void deleteById(String id) {
 		quizDAO.deleteById(id);
 	}
+	@Override
+    public QuizDetailsDTO getQuizDetails(String id) {
+        QuizDetailsDTO quiz = quizDAO.findQuizWithQuestionsAndAnswers(id);
+        return quiz;
+    }
 
 }

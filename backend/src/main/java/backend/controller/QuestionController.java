@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import backend.entity.Answer;
 import backend.entity.Question;
 import backend.entity.Quiz;
 import backend.service.QuestionService;
@@ -32,6 +33,21 @@ public class QuestionController {
                 return ResponseEntity.noContent().build();
             }
             ApiResponse<List<Question>> response = new ApiResponse<>("ok", "Successfully", quiz);
+            return ResponseEntity.ok(response);
+        } catch(Exception e){
+        	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        			.body(new ApiResponse<>("error", e.getMessage(), null));
+        }
+    }
+    
+    @GetMapping("/get-answer/{id}")
+    public ResponseEntity<ApiResponse<List<Answer>>> getAnswer(@PathVariable String id) {
+        try {
+        	List<Answer> answer = questionService.getAnswers(id);
+            if (answer.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            ApiResponse<List<Answer>> response = new ApiResponse<>("ok", "Successfully", answer);
             return ResponseEntity.ok(response);
         } catch(Exception e){
         	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -2,6 +2,7 @@ package backend.dao;
 
 import java.util.List;
 
+import backend.dto.QuizDetailsDTO;
 import backend.entity.Quiz;
 
 public interface QuizDAO {
@@ -10,4 +11,5 @@ public interface QuizDAO {
     public void createQuiz(Quiz theQuiz);
     public void updateQuiz(Quiz theQuiz);
     public void deleteById(String id);
+    public QuizDetailsDTO findQuizWithQuestionsAndAnswers(String id);
 }

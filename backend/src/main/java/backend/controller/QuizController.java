@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import backend.dto.QuizDetailsDTO;
 import backend.entity.Course;
 import backend.entity.Quiz;
 import backend.service.CourseService;
@@ -38,22 +39,19 @@ public class QuizController {
         			.body(new ApiResponse<>("error", e.getMessage(), null));
         }
     }
+    
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Quiz>> getQuizById(@PathVariable String id) {
-    	try {
-
-    		Quiz quiz = quizService.findById(id);
-    		System.out.print(quiz);
-            if (quiz == null) {
-                return ResponseEntity.notFound().build();
-            }
-            ApiResponse<Quiz> response = new ApiResponse<>("ok", "Successfully", quiz);
-            return ResponseEntity.ok(response);
-    	} catch (Exception e) {
-    		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-    				.body(new ApiResponse<>("error", e.getMessage(), null));
-    	}
+    public ResponseEntity<ApiResponse<QuizDetailsDTO>> getQuizDetails(@PathVariable String id) {
+    	 try {
+             QuizDetailsDTO quizDTO = quizService.getQuizDetails(id);
+             return ResponseEntity.ok(
+                 new ApiResponse<QuizDetailsDTO>("success", "Lấy thông tin quiz thành công", quizDTO)
+             );
+         } catch (Exception e) {
+             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                 .body(new ApiResponse<>("error", e.getMessage(), null));
+         }
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

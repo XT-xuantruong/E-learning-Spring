@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import backend.dao.QuestionDAO;
+import backend.entity.Answer;
 import backend.entity.Question;
 
 @Service
@@ -38,6 +39,12 @@ public class QuestionServiceImpl implements QuestionService{
 	@Override
 	public void deleteById(String id) {
 		questionDAO.deleteById(id);
+	}
+
+	@Override
+	public List<Answer> getAnswers(String id) {
+		
+		return questionDAO.getAnswers(id);
 	}
 
 }
