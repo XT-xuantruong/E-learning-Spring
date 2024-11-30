@@ -1,6 +1,5 @@
 USE `e-learning`;
 
-DROP TABLE IF EXISTS `comments`;
 DROP TABLE IF EXISTS `lecture`;
 DROP TABLE IF EXISTS `quiz_result`;
 DROP TABLE IF EXISTS `answer`;
@@ -9,8 +8,6 @@ DROP TABLE IF EXISTS `quiz`;
 DROP TABLE IF EXISTS `course_enrollment`;
 DROP TABLE IF EXISTS `course`;
 DROP TABLE IF EXISTS `category`;
-DROP TABLE IF EXISTS `notification`;
-DROP TABLE IF EXISTS `paypal_payment`;
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE users (
@@ -45,14 +42,18 @@ CREATE TABLE course (
 );
 
 CREATE TABLE course_enrollment (
-   id VARCHAR(36) PRIMARY KEY,
-   user_id VARCHAR(36) NOT NULL,
-   course_id VARCHAR(36) NOT NULL,
-   enroll_at TIMESTAMP,
-   ispaid BOOLEAN NOT NULL,
-   FOREIGN KEY (user_id) REFERENCES users(id),
-   FOREIGN KEY (course_id) REFERENCES course(id)
+    id VARCHAR(36) PRIMARY KEY,
+    user_id VARCHAR(36) NOT NULL,
+    course_id VARCHAR(36) NOT NULL,
+    enroll_at TIMESTAMP,
+    is_paid BOOLEAN NOT NULL DEFAULT FALSE,
+    is_finish BOOLEAN,
+    last_lecture VARCHAR(255),
+    last_quiz VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (course_id) REFERENCES course(id)
 );
+
 CREATE TABLE quiz (
    id VARCHAR(36) PRIMARY KEY,
    title VARCHAR(255) NOT NULL,
@@ -92,39 +93,4 @@ CREATE TABLE lecture (
     course_id VARCHAR(36) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     FOREIGN KEY (course_id) REFERENCES course(id)
-);
-
-CREATE TABLE comments(
-    id VARCHAR(36) PRIMARY KEY,
-    rating INT NOT NULL,
-    comment TEXT NOT NULL,
-    user_id VARCHAR(36) NOT NULL,
-    course_id VARCHAR(36) NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (course_id) REFERENCES course(id)
-);
-
-CREATE TABLE notification (
-    id VARCHAR(36) PRIMARY KEY,
-    user_id VARCHAR(36) NOT NULL,
-    message TEXT NOT NULL,
-    is_read BOOLEAN NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
-CREATE TABLE paypal_payment (
-    id VARCHAR(36) PRIMARY KEY,
-    user_id VARCHAR(36) NOT NULL,
-    paypal_payment_id VARCHAR(255) NOT NULL,
-    amount FLOAT NOT NULL,
-    currency VARCHAR(10) NOT NULL,
-    state VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    deleted_at TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
 );

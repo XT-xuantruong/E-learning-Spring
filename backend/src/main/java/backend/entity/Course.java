@@ -7,17 +7,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "course")
@@ -61,11 +51,7 @@ public class Course {
 	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnore
 	private List<Lecture> lectures = new ArrayList<>();
-	
-	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonIgnore
-	private List<Comment> comments = new ArrayList<>();
-	
+		
 	@PrePersist
 	protected void onCreate() {
 		if (id == null || id.isEmpty()) {
@@ -88,14 +74,6 @@ public class Course {
 
 	public Course() {
 		super();
-	}
-	
-	public List<Comment> getComments() {
-		return comments;
-	}
-
-	public void setComments(List<Comment> comments) {
-		this.comments = comments;
 	}
 
 	public List<Lecture> getLectures() {
