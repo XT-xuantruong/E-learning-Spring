@@ -52,7 +52,7 @@ export default class ApiService {
   async gets(params = null) {
     let option = {
       method: "get",
-      url: `/${this.entity}/`,
+      url: `/${this.entity}`,
     };
     if (params) {
       option = { ...option, params };

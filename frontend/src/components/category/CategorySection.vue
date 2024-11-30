@@ -9,11 +9,21 @@
             </a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <div v-for="category in ['Web Development', 'Mobile Development', 'UI/UX Design', 'Data Science',
-                'Machine Learning', 'DevOps', 'Digital Marketing', '...']" :key="category" class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer
+            <RouterLink :to="'/category/' + category.slug" v-for="category in categories" :key="category" class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer
                     border-2 border-transparent hover:border-blue-600">
-                <h3 class="text-lg font-semibold text-center">{{ category }}</h3>
-            </div>
+                <h3 class="text-lg font-semibold text-center">{{ category.title }}</h3>
+            </RouterLink>
         </div>
     </section>
 </template>
+
+<script setup>
+import { defineProps } from 'vue'
+
+const props = defineProps({
+    categories: {
+        type: Array,
+        required: true
+    }
+})
+</script>
