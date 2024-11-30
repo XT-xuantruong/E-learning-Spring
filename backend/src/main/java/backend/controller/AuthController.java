@@ -16,9 +16,9 @@ import java.util.Map;
 
 import backend.entity.Role; 
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/user") 
-@CrossOrigin
 public class AuthController {
 
 	 @Autowired
@@ -101,7 +101,8 @@ public class AuthController {
     
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(@RequestHeader("Authorization") String authHeader) {
-        try {
+    	System.out.print(authHeader);
+    	try {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
                 authService.logout(token);

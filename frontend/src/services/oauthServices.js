@@ -15,23 +15,27 @@ class OauthServices extends ApiService {
     console.log(data);
     return this.request({
       method: "post",
-      url: `/${this.entity}/sign-in/`,
+      url: `/${this.entity}/login`,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
       data: data,
     });
   }
   async signup(credential) {
     const {
       firstName,
-      LastName,
+      lastName,
       email,
       password,
       confirmPassword,
       phone,
       role,
     } = credential;
+
     var data = {
       firstName: firstName,
-      LastName: LastName,
+      lastName: lastName,
       email: email,
       password: password,
       confirmPassword: confirmPassword,
@@ -42,18 +46,26 @@ class OauthServices extends ApiService {
     return this.request({
       method: "post",
       url: `/${this.entity}/register`,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
       data: data,
     });
   }
 
   async logout(access, refresh) {
+    console.log(access, refresh);
+    
     const data = {
       access_token: access,
       refresh_token: refresh,
     };
     const option = {
       method: "post",
-      url: `/${this.entity}/logout/`,
+      url: `/${this.entity}/logout`,
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
       data: data,
     };
     return this.request(option);

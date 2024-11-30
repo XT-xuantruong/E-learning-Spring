@@ -4,6 +4,12 @@ import axios from "axios";
 export const useUserStore = defineStore("user", {
   persist: {
     enabled: true,
+    strategies: [
+      {
+        key: "user",
+        storage: localStorage,
+      },
+    ],
   },
   state: () => ({
     user: {
@@ -39,8 +45,6 @@ export const useUserStore = defineStore("user", {
     },
 
     setToken(data) {
-      console.log("setToken", data);
-
       this.user.access = data.access_token;
       this.user.refresh = data.refresh_token;
       this.user.isAuthenticated = true;
@@ -49,11 +53,9 @@ export const useUserStore = defineStore("user", {
       localStorage.setItem("user.refresh", data.refresh_token);
       localStorage.setItem("user.isAuthenticated", true);
 
-      console.log("user.access: ", localStorage.getItem("user.access"));
     },
 
     removeToken() {
-      console.log("removeToken");
 
       this.user.refresh = null;
       this.user.access = null;
@@ -73,9 +75,8 @@ export const useUserStore = defineStore("user", {
     },
 
     setUserInfo(user) {
-      console.log("setUserInfo", user._id);
 
-      this.user.id = user._id;
+      this.user.id = user.id;
       this.user.name = user.name;
       this.user.email = user.email;
       this.user.avatar = user.avatar;
@@ -85,7 +86,6 @@ export const useUserStore = defineStore("user", {
       localStorage.setItem("user.email", this.user.email);
       localStorage.setItem("user.avatar", this.user.avatar);
 
-      console.log("User", this.user);
     },
     updateAvatar(avatar) {
       console.log(avatar);
