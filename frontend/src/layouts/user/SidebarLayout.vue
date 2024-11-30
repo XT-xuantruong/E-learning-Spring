@@ -12,7 +12,7 @@
                             name: 'category',
                             query: { c: category.slug },
                         }" class="text-black w-full flex items-center">
-                            <span>{{ category.name }} ({{ getTotalItems(category.id) }})</span>
+                            <span>{{ category.title }} ({{ getTotalItems(category.id) }})</span>
                         </RouterLink>
                     </li>
                 </ul>
@@ -31,16 +31,40 @@
     </div>
 </template>
 <script setup>
-import Header from '@/components/Header/Header.vue';
+import Header from '@/components/header/Header.vue';
 import Footer from '@/components/footer/Footer.vue';
-import categories from '@/faker/categories';
-import courses from '@/faker/course';
-import { RouterLink } from "vue-router";
-import { computed, ref } from "vue";
 
+import { RouterLink } from "vue-router";
+import { computed, onBeforeMount, ref } from "vue";
+import categoryServices from '@/services/categoryServices';
+import courseServices from '@/services/courseServices';
+const courses = ref([])
+const categories = ref([])
+const fetchCategory = async () => {
+    await categoryServices.gets()
+        .then(response => {
+            categories.value = response.data.data
+        })
+        .catch(error => {
+            console.error(error)
+        })
+}
+const fetchCourse = async () => {
+    await courseServices.gets()
+        .then(response => {
+            courses.value = response.data.data
+        })
+        .catch(error => {
+            console.error(error)
+        })
+}
+onBeforeMount(() => {
+    fetchCategory()
+    fetchCourse()
+})
 const displayedCount = ref(2);
 const visibleCategories = computed(() => {
-    return categories.slice(0, displayedCount.value);
+    return categories.value.slice(0, displayedCount.value);
 });
 
 // Tính số danh mục còn lại
@@ -52,7 +76,7 @@ const loadMoreCategories = () => {
     displayedCount.value += 10;
 };
 const getTotalItems = (categoryId) => {
-    return courses.filter((p) => p.category_id === categoryId).length;
+    return courses.value.filter((p) => p.category_id.id === categoryId).length;
 };
 
 </script>

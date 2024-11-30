@@ -52,6 +52,23 @@ public class CategoryController {
     				.body(new ApiResponse<>("error", e.getMessage(), null));
     	}
     }
+    
+    @GetMapping("/get-slug/{slug}")
+    public ResponseEntity<ApiResponse<Category>> getCategoryBySlug(@PathVariable String slug) {
+    	try {
+
+    		Category category = categoryService.findBySlug(slug);
+    		System.out.print(category);
+            if (category == null) {
+                return ResponseEntity.notFound().build();
+            }
+            ApiResponse<Category> response = new ApiResponse<>("ok", "Successfully", category);
+            return ResponseEntity.ok(response);
+    	} catch (Exception e) {
+    		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+    				.body(new ApiResponse<>("error", e.getMessage(), null));
+    	}
+    }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<Category>> createCategory(

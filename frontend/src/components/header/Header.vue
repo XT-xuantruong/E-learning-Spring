@@ -3,7 +3,9 @@
     <nav class="container mx-auto px-4 py-4">
       <div class="flex justify-between items-center">
         <!-- Logo -->
-        <h1 class="text-2xl font-bold text-blue-600">E-Learning</h1>
+        <RouterLink to="/">
+          <h1 class="text-2xl font-bold text-blue-600">E-Learning</h1>
+        </RouterLink>
 
         <!-- Search and Navigation -->
         <div class="flex items-center flex-1 max-w-2xl mx-12">
@@ -22,27 +24,6 @@
               </button>
             </form>
 
-            <!-- Search Suggestions Dropdown -->
-            <div v-if="isSearchFocused && filteredSuggestions.length > 0"
-              class="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50">
-              <div class="p-2">
-                <div v-for="(suggestion, index) in filteredSuggestions" :key="index"
-                  @click="handleSuggestionClick(suggestion)"
-                  class="flex items-center px-3 py-2 hover:bg-gray-50 rounded cursor-pointer">
-                  <!-- Icon based on type -->
-                  <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                    <span class="text-blue-600 text-sm">
-                      {{ suggestion.type === 'course' ? '📚' :
-                        suggestion.type === 'instructor' ? '👨‍🏫' : '📝' }}
-                    </span>
-                  </div>
-                  <div>
-                    <div class="text-sm font-medium">{{ suggestion.title }}</div>
-                    <div class="text-xs text-gray-500">{{ suggestion.category }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -70,7 +51,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, RouterLink } from 'vue-router'
 import { Search, X } from 'lucide-vue-next'
 
 const router = useRouter()

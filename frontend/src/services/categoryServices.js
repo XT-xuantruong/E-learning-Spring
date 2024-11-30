@@ -5,6 +5,13 @@ class CategoryServices extends ApiService {
   get entity() {
     return "category";
   }
+
+  async getByslug(slug) {
+    return this.request({
+      method: "get",
+      url: `/${this.entity}/get-slug/${slug}`,
+    });
+  }
   async create(data) {
     // const adminStore = useAdminStore();
     return this.request({

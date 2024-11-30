@@ -30,7 +30,26 @@ public class CategoryDAOImpl implements CategoryDAO{
 		Session currentSession = sessionFactory.getCurrentSession();
         return currentSession.get(Category.class, id);
 	}
-
+	
+	@Override
+	@Transactional
+	public Category findBySlug(String slug) {
+		System.out.print(slug);
+		Session currentSession = sessionFactory.getCurrentSession();
+		try {
+	                
+			String hql = "FROM Category c WHERE c.Slug = :slugParam";
+	        Query<Category> query = currentSession.createQuery(hql, Category.class);
+	        query.setParameter("slugParam", slug);
+	        
+	        return query.uniqueResult();
+	        
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return null; // or throw your custom exception
+	    }
+	}
+	
 	@Override
 	@Transactional
 	public void createCategory(Category theCategory) {

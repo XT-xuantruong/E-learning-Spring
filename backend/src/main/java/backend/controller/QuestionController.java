@@ -13,7 +13,7 @@ import backend.service.QuizService;
 import backend.util.ApiResponse;
 
 import java.util.List;
-
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/question")
 public class QuestionController {

@@ -2,12 +2,13 @@
     <RouterLink :to="{ name: 'course-detail', query: { course: course.id } }"
         class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 h-[480px] flex flex-col">
         <div class="h-48 w-full flex-shrink-0">
-            <img :src="course.thumbnail" :alt="course.title" class="w-full h-full object-cover" />
+            <img :src="'http://localhost:8092/backend' + course.thumbnail" :alt="course.title"
+                class="w-full h-full object-cover" />
         </div>
 
         <div class="p-6 flex flex-col flex-grow">
             <div class="flex-grow">
-                <span class="text-sm text-blue-600 font-medium">{{ category.name }}</span>
+                <span class="text-sm text-blue-600 font-medium">{{ course.category_id.title }}</span>
                 <h3 class="text-xl font-semibold mt-2 line-clamp-2">{{ course.title }}</h3>
                 <p class="mt-4 text-gray-600 text-sm line-clamp-3">{{ course.description }}</p>
             </div>
@@ -41,16 +42,18 @@ const formatPrice = (price) => {
         currency: 'VND'
     }).format(price);
 };
-const fetchCategory = async () => {
-    await categoryServices.get(props.course.category_id)
-        .then(response => {
-            category.value = response.data.data
-        })
-        .catch(error => {
-            console.error(error)
-        })
-}
-onBeforeMount(() => {
-    fetchCategory()
-})
+// console.log(props.course.category_id);
+
+// const fetchCategory = async () => {
+//     await categoryServices.get(props.course.category_id)
+//         .then(response => {
+//             category.value = response.data.data
+//         })
+//         .catch(error => {
+//             console.error(error)
+//         })
+// }
+// onBeforeMount(() => {
+//     fetchCategory()
+// })
 </script>

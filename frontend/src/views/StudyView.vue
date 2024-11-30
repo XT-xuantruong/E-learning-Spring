@@ -1,7 +1,7 @@
 <template>
     <DefaultLayout>
         <!-- Progress Section -->
-        <CourseProgress :course="course" :completedLessons="completedLessons" :totalLessons="lessons.length" />
+        <CourseProgress :course="currentCourse" :completedLessons="completedLessons" :totalLessons="lessons.length" />
 
         <div class="grid grid-cols-3">
             <!-- PDF Viewer Section -->
@@ -18,27 +18,58 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, onBeforeMount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import DefaultLayout from '@/layouts/user/DefaultLayout.vue';
-import lectures from '@/faker/lectures';
-import courses from '@/faker/course';
+// import lectures from '@/faker/lectures';
+// import courses from '@/faker/course';
 import CourseProgress from '@/components/course/CourseProgress.vue';
 import PdfViewer from '@/components/pdf/PdfViewer.vue';
 import LessonsList from '@/components/course/LessonsList.vue';
+import courseServices from '@/services/courseServices';
+import lectureServices from '@/services/lectureServices';
 
 // Router setup
 const route = useRoute();
 const router = useRouter();
+const courseId = route.query.course
+const lectures = ref([])
+const currentCourse = ref({})
+// Lấy danh sách bài giảng của khóa học
+const lessons = computed(() => {
 
+    return lectures.value = lectures.value
+        .filter(lecture => lecture.course.id == courseId)
+        .sort((a, b) => a.title.localeCompare(b.title));
+})
+const fetchCourse = async () => {
+    await courseServices.get(courseId)
+        .then(response => {
+            currentCourse.value = response.data.data
+        })
+        .catch(error => {
+            console.error(error)
+        })
+}
+const fetchLecture = async () => {
+    await lectureServices.gets()
+        .then(response => {
+            lectures.value = response.data.data
+        })
+        .catch(error => {
+            console.error(error)
+        })
+}
+onBeforeMount(() => {
+    fetchCourse()
+    fetchLecture()
+    // fetchCategory()
+})
 // State
 const currentIndex = ref(-1);
 const pdfUrl = ref('');
 const completedLessons = ref(2);
 
-// Computed properties
-const course = computed(() => courses.find(c => c.id == route.query.course));
-const lessons = computed(() => lectures.filter(l => l.course_id == course.value.id));
 
 // Find lesson index by ID
 const findLessonIndex = (lessonId) => {
@@ -78,7 +109,7 @@ watch(
 // Methods
 const selectPdf = (index) => {
     currentIndex.value = index;
-    pdfUrl.value = lessons.value[index]?.content;
+    pdfUrl.value = "http://localhost:8092/backend" + lessons.value[index]?.content;
 };
 
 const nextPdf = () => {

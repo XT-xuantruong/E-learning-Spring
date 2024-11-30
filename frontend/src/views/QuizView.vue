@@ -1,43 +1,47 @@
 <script setup>
-import { ref, computed } from 'vue';
+import questionServices from '@/services/questionServices';
+import quizServices from '@/services/quizServices';
+import { ref, computed, onBeforeMount } from 'vue';
+import { useRoute } from 'vue-router'
+const route = useRoute()
+const categories = ref([])
+const quizList = ref({})
+const questions = ref([]);
+const fetchQuiz = async () => {
+    await quizServices.get(route.query.q)
+        .then(response => {
+            quizList.value = response.data.data
+        })
+        .catch(error => {
+            console.error(error)
+        })
+}
+const fetchQuestion = async () => {
+    await questionServices.gets()
+        .then(response => {
+            questions.value = response.data.data
+            questions.value = questions.value.filter(question => question.quiz.id == route.query.q)
+            console.log(questions.value);
 
-const questions = ref([
-    {
-        id: 1,
-        question: 'What is the capital of France?',
-        options: ['London', 'Paris', 'Berlin', 'Madrid'],
-        answer: 1,
-        userAnswer: null
-    },
-    {
-        id: 2,
-        question: 'Which planet in our solar system is known as the "Red Planet"?',
-        options: ['Jupiter', 'Saturn', 'Mars', 'Venus'],
-        answer: 2,
-        userAnswer: null
-    },
-    {
-        id: 3,
-        question: 'What is the largest ocean on Earth?',
-        options: ['Atlantic Ocean', 'Indian Ocean', 'Arctic Ocean', 'Pacific Ocean'],
-        answer: 3,
-        userAnswer: null
-    },
-    {
-        id: 4,
-        question: 'Who is credited with inventing the telephone?',
-        options: ['Thomas Edison', 'Alexander Graham Bell', 'Nikola Tesla', 'Benjamin Franklin'],
-        answer: 1,
-        userAnswer: null
-    },
-    {
-        id: 5,
-        question: 'In what year did World War II end?',
-        options: ['1945', '1939', '1941', '1947'],
-        answer: 0,
-        userAnswer: null
-    }
-]);
+        })
+        .catch(error => {
+            console.error(error)
+        })
+}
+// const fetchCategory = async () => {
+//     await categoryServices.gets()
+//         .then(response => {
+//             categories.value = response.data.data
+//         })
+//         .catch(error => {
+//             console.error(error)
+//         })
+// }
+onBeforeMount(() => {
+    fetchQuiz()
+    fetchQuestion()
+})
+
 
 const score = ref(0);
 const isSubmitted = ref(false);
@@ -99,7 +103,7 @@ const getOptionClass = (question, optionIndex) => {
         <div class="max-w-3xl mx-auto">
             <!-- Header -->
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">General Knowledge Quiz</h1>
+                <h1 class="text-3xl font-bold text-gray-900">{{ quizList.title }}</h1>
                 <p class="mt-2 text-gray-600">Answer all questions and submit to see your score</p>
             </div>
 

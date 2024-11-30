@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
-
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/lecture")
 public class LectureController {

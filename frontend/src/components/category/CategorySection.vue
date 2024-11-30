@@ -3,10 +3,6 @@
     <section class="py-16 container mx-auto px-4">
         <div class="flex justify-between items-center border-b pb-2 mb-12">
             <h2 class="text-3xl font-bold">Danh mục khóa học</h2>
-            <a href="/categories" class="text-blue-600 hover:text-blue-800 font-medium transition-colors">
-                Xem tất cả
-                <span class="ml-1">→</span>
-            </a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <RouterLink :to="{ name: 'category', query: { ...route.query, c: category.slug } }"

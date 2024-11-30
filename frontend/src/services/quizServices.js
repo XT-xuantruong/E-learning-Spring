@@ -1,9 +1,9 @@
 import ApiService from "./ApiService";
 // import { useAdminStore } from "@/stores/admin";
 
-class CourseServices extends ApiService {
+class QuizServices extends ApiService {
   get entity() {
-    return "courses";
+    return "quiz";
   }
   // async update(data) {
   //   // const adminStore = useAdminStore();
@@ -57,4 +57,4 @@ class CourseServices extends ApiService {
   // }
 }
 
-export default new CourseServices();
+export default new QuizServices();

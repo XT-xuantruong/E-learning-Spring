@@ -24,6 +24,11 @@ public class CategoryServiceImpl implements CategoryService{
 	public Category findById(String id) {
 		return categoryDAO.findById(id);
 	}
+	
+	@Override
+	public Category findBySlug(String slug) {
+		return categoryDAO.findBySlug(slug);
+	}
 
 	@Override
 	public void createCategory(Category theCategory) {

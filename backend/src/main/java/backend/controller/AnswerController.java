@@ -1,6 +1,7 @@
 package backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import backend.util.ApiResponse;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/answer")
 public class AnswerController {

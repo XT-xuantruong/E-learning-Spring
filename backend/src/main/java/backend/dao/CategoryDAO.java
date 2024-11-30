@@ -7,6 +7,7 @@ import backend.entity.Category;
 public interface CategoryDAO {
 	public List<Category> readListCategory();
     public Category findById(String id);
+    public Category findBySlug(String slug);
     public void createCategory(Category theCategory);
     public void updateCategory(Category theCategory);
     public void deleteById(String id);

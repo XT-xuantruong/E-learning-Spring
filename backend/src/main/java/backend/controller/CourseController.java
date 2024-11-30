@@ -25,6 +25,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/courses")
 public class CourseController {
@@ -85,7 +86,7 @@ public class CourseController {
         try {
         	String projectPath = context.getRealPath("resources/");
         	Path uploadPath = Paths.get(projectPath, "images", "thumbnail").toAbsolutePath();
-        	
+        	System.out.print(projectPath);
         	if (thumbnail.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 		.body(new ApiResponse<>("error", "thumbnail invalid", null));

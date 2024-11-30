@@ -184,40 +184,6 @@ const handleNewsletterSubmit = () => {
         <CourseCard v-for="course in courseList" :key="course.id" :course="course" />
       </div>
     </section>
-    <!-- Instructors -->
-    <section class="py-16 bg-gray-100">
-      <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center mb-12">Đội ngũ giảng viên</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div v-for="instructor in instructors" :key="instructor.id" class="bg-white rounded-lg p-6 text-center">
-            <img :src="instructor.image" :alt="instructor.name"
-              class="w-32 h-32 rounded-full mx-auto mb-4 object-cover" />
-            <h3 class="text-xl font-semibold">{{ instructor.name }}</h3>
-            <p class="text-blue-600 mt-1">{{ instructor.role }}</p>
-            <p class="text-gray-600 mt-2">{{ instructor.description }}</p>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- Reviews -->
-    <section class="py-16 container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-center mb-12">Đánh giá từ học viên</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div v-for="review in reviews" :key="review.id" class="bg-white rounded-lg p-6 shadow">
-          <div class="flex items-center mb-4">
-            <img :src="review.avatar" :alt="review.name" class="w-12 h-12 rounded-full mr-4" />
-            <div>
-              <h4 class="font-semibold">{{ review.name }}</h4>
-              <div class="flex text-yellow-400">
-                <span v-for="star in review.rating" :key="star">⭐</span>
-              </div>
-            </div>
-          </div>
-          <p class="text-gray-600">{{ review.comment }}</p>
-        </div>
-      </div>
-    </section>
-
     <!-- FAQ Section -->
     <section class="py-16 bg-gray-50">
       <div class="container mx-auto px-4">
