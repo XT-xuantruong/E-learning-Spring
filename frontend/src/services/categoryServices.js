@@ -1,4 +1,4 @@
-// import { useAdminStore } from "@/stores/admin";
+import { useAdminStore } from "@/stores/admin";
 import ApiService from "./ApiService";
 
 class CategoryServices extends ApiService {
@@ -13,25 +13,28 @@ class CategoryServices extends ApiService {
     });
   }
   async create(data) {
-    // const adminStore = useAdminStore();
+    const adminStore = useAdminStore();
     return this.request({
       method: "post",
-      url: `/${this.entity}/`,
+      url: `/${this.entity}`,
       data: data,
-      // headers: {
-      //   Authorization: `Bearer ${adminStore.admin.access}`,
-      // },
+   
+      headers: {
+        Authorization: `Bearer ${adminStore.admin.access}`,
+         "Content-Type": "multipart/form-data",
+      },
     });
   }
   async update(data) {
     const adminStore = useAdminStore();
-    const { _id } = data;
+    const { id } = data;
     return this.request({
       method: "put",
-      url: `/${this.entity}/${_id}/`,
+      url: `/${this.entity}/${id}`,
       data: data,
       headers: {
         Authorization: `Bearer ${adminStore.admin.access}`,
+        "Content-Type": "multipart/form-data",
       },
     });
   }
@@ -40,9 +43,10 @@ class CategoryServices extends ApiService {
     const adminStore = useAdminStore();
     return this.request({
       method: "delete",
-      url: `/${this.entity}/${id}/`,
+      url: `/${this.entity}/${id}`,
       headers: {
         Authorization: `Bearer ${adminStore.admin.access}`,
+        "Content-Type": "multipart/form-data",
       },
     });
   }

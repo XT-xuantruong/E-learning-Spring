@@ -253,9 +253,12 @@
 <script setup>
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
+import oauthServices from "@/services/oauthServices";
+import { useAdminStore } from "@/stores/admin";
 
 // Router instance
 const router = useRouter();
+const adminStore = useAdminStore();
 
 // Form data
 const email = ref("");
@@ -304,9 +307,23 @@ const handleSubmit = async () => {
   try {
     isLoading.value = true;
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    router.push("/");
+    // await new Promise((resolve) => setTimeout(resolve, 1500));
+    await oauthServices
+      .login({
+        email: email.value,
+        password: password.value,
+      })
+      .then((response) => {
+        const data = response.data.data;
+        data.user.name = data.user.firstName + " " + data.user.lastName;
+        console.log(data);
+        adminStore.setToken({
+          access_token: data.access_token,
+          refresh_token: data.refresh_token,
+        });
+        adminStore.setAdminInfo(data.user);
+        router.push("/admin");
+      });
   } catch (error) {
     console.error("Login error:", error);
   } finally {

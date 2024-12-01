@@ -59,7 +59,6 @@
               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-      
         </div>
       </div>
 
@@ -135,7 +134,6 @@
               <div class="text-sm font-medium text-gray-900">
                 {{ category.title }}
               </div>
-              <div class="text-xs text-gray-500">ID: {{ category.id }}</div>
             </div>
             <div class="col-span-3">
               <span
@@ -153,14 +151,14 @@
                 class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md hover:bg-indigo-100 transition-colors duration-200"
                 title="Sửa"
               >
-              <font-awesome-icon :icon="['fas', 'pen']" />
+                <font-awesome-icon :icon="['fas', 'pen']" />
               </button>
               <button
                 @click="deleteCategory(category.id)"
                 class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md hover:bg-red-100 transition-colors duration-200"
                 title="Xóa"
               >
-              <font-awesome-icon :icon="['fas', 'trash']" />
+                <font-awesome-icon :icon="['fas', 'trash']" />
               </button>
             </div>
           </div>
@@ -225,7 +223,6 @@
                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 :class="{ 'border-red-300': formErrors.slug }"
                 placeholder="Nhập slug danh mục"
-                :disabled="isEditing"
                 required
               />
               <p class="mt-1 text-sm text-gray-500">
@@ -280,24 +277,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from "vue";
+import { ref, reactive, computed, watch, onBeforeMount } from "vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
+import categoryServices from "@/services/categoryServices";
 
 // State
-const categories = ref([
-  {
-    id: 1,
-    title: "Danh mục mẫu 1",
-    slug: "danh-muc-mau-1",
-    createdAt: new Date("2024-01-01"),
-  },
-  {
-    id: 2,
-    title: "Danh mục mẫu 2",
-    slug: "danh-muc-mau-2",
-    createdAt: new Date("2024-01-02"),
-  },
-]);
+const categories = ref([]);
 const isEditing = ref(false);
 const editingId = ref(null);
 const isModalOpen = ref(false);
@@ -321,9 +306,8 @@ const filteredCategories = computed(() => {
   // Search
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
-    result = result.filter(
-      (category) =>
-        category.title.toLowerCase().includes(query) 
+    result = result.filter((category) =>
+      category.title.toLowerCase().includes(query)
     );
   }
 
@@ -401,7 +385,6 @@ const validateForm = () => {
     isValid = false;
   }
 
-  // Kiểm tra trùng lặp
   const existingCategory = categories.value.find(
     (cat) => cat.slug === categoryForm.slug && cat.id !== editingId.value
   );
@@ -420,7 +403,7 @@ const handleSubmit = async () => {
     isSubmitting.value = true;
 
     if (isEditing.value) {
-      // Update existing category
+      await categoryServices.update({"id": editingId.value, 'title': categoryForm.title, 'slug': categoryForm.slug});
       const index = categories.value.findIndex(
         (cat) => cat.id === editingId.value
       );
@@ -432,17 +415,18 @@ const handleSubmit = async () => {
         };
       }
     } else {
-      // Add new category
-      const newCategory = {
-        id: Date.now(), // Simple ID generation
-        title: categoryForm.title,
-        slug: categoryForm.slug,
-        createdAt: new Date(),
-      };
-      categories.value.push(newCategory);
+      await categoryServices.create(categoryForm).then((response) => {
+        const data = response.data.data;
+        const newCategory = {
+          id: data.id,
+          title: data.title,
+          slug: data.slug,
+          createdAt: data.createdAt,
+        };
+        categories.value.push(newCategory);
+      });
     }
 
-    // Close modal after successful submission
     closeModal();
   } catch (error) {
     console.error("Error submitting form:", error);
@@ -451,11 +435,18 @@ const handleSubmit = async () => {
   }
 };
 
+onBeforeMount(async () => {
+  await categoryServices.gets().then((response) => {
+    categories.value = response.data.data;
+    
+  });
+});
+
 const deleteCategory = async (id) => {
   if (!confirm("Bạn có chắc chắn muốn xóa danh mục này?")) return;
 
   try {
-    // Remove category from list
+    await categoryServices.delete(id)
     categories.value = categories.value.filter((cat) => cat.id !== id);
   } catch (error) {
     console.error("Error deleting category:", error);

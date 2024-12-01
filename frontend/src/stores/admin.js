@@ -3,7 +3,13 @@ import axios from "axios";
 
 export const useAdminStore = defineStore("admin", {
   persist: {
-    enabled: true, // Lưu trạng thái nếu cần
+    enabled: true,
+    strategies: [
+      {
+        key: "admin",
+        storage: localStorage,
+      },
+    ],
   },
   state: () => ({
     admin: {

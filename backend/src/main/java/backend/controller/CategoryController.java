@@ -72,11 +72,13 @@ public class CategoryController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<Category>> createCategory(
-    		@RequestParam("title") String title
+    		@RequestParam("title") String title,
+    		@RequestParam("slug") String slug
     	    ) {      
         try {
         	Category category = new Category();
         	category.setTitle(title);
+        	category.setSlug(slug);
         	categoryService.createCategory(category);
     		System.out.print(category);
             ApiResponse<Category> response = new ApiResponse<>("ok", "Successfully", category);
@@ -91,7 +93,8 @@ public class CategoryController {
     @PutMapping(value ="/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<Category>> updateCategory(
     		@PathVariable String id, 
-    		@RequestParam("title") String title
+    		@RequestParam("title") String title,
+    		@RequestParam("slug") String slug
     		){
         
         try {
@@ -101,6 +104,7 @@ public class CategoryController {
                 return ResponseEntity.ok(response);
         	}
         	category.setTitle(title);
+        	category.setSlug(slug);
             categoryService.updateCategory(category);
     		System.out.print(category);
             ApiResponse<Category> response = new ApiResponse<>("ok", "Successfully",category);
