@@ -3,6 +3,8 @@ package backend.entity;
 import java.util.Date;
 import java.util.UUID;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,6 +16,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+
 
 @Entity
 @Table(name = "quiz_result")
@@ -27,10 +30,10 @@ public class QuizResult {
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false)
     private Quiz quiz;
-
+    
     @ManyToOne
-    @JoinColumn(name = "course_id", nullable = false)
-    private Course course;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "created_at", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -48,13 +51,20 @@ public class QuizResult {
 		super();
 	}
 
-	public QuizResult(String id, float score, Quiz quiz, Course course, Date createdAt) {
+	public QuizResult(String id, float score, Quiz quiz, Date createdAt) {
 		super();
 		this.id = id;
 		this.score = score;
 		this.quiz = quiz;
-		this.course = course;
 		this.createdAt = createdAt;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public String getId() {
@@ -79,14 +89,6 @@ public class QuizResult {
 
 	public void setQuiz(Quiz quiz) {
 		this.quiz = quiz;
-	}
-
-	public Course getCourse() {
-		return course;
-	}
-
-	public void setCourse(Course course) {
-		this.course = course;
 	}  
     
 }

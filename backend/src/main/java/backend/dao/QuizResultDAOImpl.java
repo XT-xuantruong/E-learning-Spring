@@ -55,5 +55,14 @@ public class QuizResultDAOImpl implements QuizResultDAO{
         currentSession.remove(theQuizResult);
 		
 	}
+
+	@Override
+	@Transactional
+	public List<QuizResult> getListQuizResultbyUser(String id) {
+		Session currentSession = sessionFactory.getCurrentSession();
+        Query<QuizResult> theQuery = currentSession.createQuery("FROM QuizResult where user.id= :id", QuizResult.class);
+        theQuery.setParameter("id", id);
+        return theQuery.getResultList();
+	}
 	
 }

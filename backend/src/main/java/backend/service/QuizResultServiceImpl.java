@@ -40,4 +40,9 @@ public class QuizResultServiceImpl implements QuizResultService{
 		quizResultDAO.deleteById(id);
 	}
 
+	@Override
+	public List<QuizResult> getListQuizResultbyUser(String id) {
+		return quizResultDAO.getListQuizResultbyUser(id);
+	}
+
 }

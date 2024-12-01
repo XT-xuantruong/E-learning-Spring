@@ -22,15 +22,15 @@
         </h2>
         <li v-for="(quiz, index) in quizs" :key="quiz.id" :class="[
             'flex items-center py-2 px-5 border-b hover:bg-blue-400 hover:text-white',
-            { 'text-gray-400 cursor-not-allowed': isLocked(index) }
+
         ]">
             <RouterLink :to="{
                 name: 'quiz',
                 query: { q: quiz.id }
-            }" :class="{ 'cursor-not-allowed': isLocked(index) }" @click.prevent="handleLessonClick(index)">
+            }" @click.prevent="handleLessonClick(index)">
                 {{ index + 1 }}. {{ quiz.title }}
             </RouterLink>
-            <span v-if="isLessonCompleted(index)" class="ml-auto text-green-500">✔</span>
+            <span v-if="isQuizCompleted(quiz.id)" class="ml-auto text-green-500">✔</span>
         </li>
     </ul>
 </template>
@@ -57,6 +57,10 @@ const props = defineProps({
     completedLessons: {
         type: Number,
         required: true
+    },
+    quizResultList: {
+        type: Array,
+        required: true
     }
 });
 
@@ -68,6 +72,9 @@ const isLocked = (index) => {
 
 const isLessonCompleted = (index) => {
     return index <= props.completedLessons;
+};
+const isQuizCompleted = (quizId) => {
+    return props.quizResultList.some(result => result.quiz.id === quizId);
 };
 
 const handleLessonClick = (index) => {

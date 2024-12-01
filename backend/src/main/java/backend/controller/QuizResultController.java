@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import backend.entity.Course;
 import backend.entity.Quiz;
 import backend.entity.QuizResult;
+import backend.entity.User;
+import backend.service.AuthService;
 import backend.service.CourseService;
 import backend.service.QuizResultService;
 import backend.service.QuizService;
@@ -16,6 +18,7 @@ import backend.util.ApiResponse;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/quiz-result")
 public class QuizResultController {
@@ -27,12 +30,30 @@ public class QuizResultController {
     private QuizService quizService;
     
     @Autowired
+    private AuthService authService;
+    
+    @Autowired
     private CourseService courseService;
     
     @GetMapping
     public ResponseEntity<ApiResponse<List<QuizResult>>> getAllQuizResult() {
         try {
         	List<QuizResult> quiz_result = quizResultService.readListQuizResult();
+            if (quiz_result.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            ApiResponse<List<QuizResult>> response = new ApiResponse<>("ok", "Successfully", quiz_result);
+            return ResponseEntity.ok(response);
+        } catch(Exception e){
+        	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        			.body(new ApiResponse<>("error", e.getMessage(), null));
+        }
+    }
+    @GetMapping("/get-by-user/{id}")
+    public ResponseEntity<ApiResponse<List<QuizResult>>> getQuizResultByUser(
+    		@PathVariable String id) {
+        try {
+        	List<QuizResult> quiz_result = quizResultService.getListQuizResultbyUser(id);
             if (quiz_result.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
@@ -64,7 +85,7 @@ public class QuizResultController {
     public ResponseEntity<ApiResponse<QuizResult>> createQuizResult(
     		@RequestParam("score") String score,
     		@RequestParam("quiz") String quiz,
-    		@RequestParam("course") String course
+    		@RequestParam("user") String user
     	    ) {      
         try {
         	QuizResult quiz_result = new QuizResult();
@@ -74,8 +95,8 @@ public class QuizResultController {
         	Quiz q = quizService.findById(quiz);
         	quiz_result.setQuiz(q);
         	
-        	Course c = courseService.findById(course);
-        	quiz_result.setCourse(c);
+        	User u = authService.findById(user);
+        	quiz_result.setUser(u);
         	
         	quizResultService.createQuizResult(quiz_result);
             ApiResponse<QuizResult> response = new ApiResponse<>("ok", "Successfully", quiz_result);
@@ -91,8 +112,7 @@ public class QuizResultController {
     public ResponseEntity<ApiResponse<QuizResult>> updateQuizResult(
     		@PathVariable String id, 
     		@RequestParam(value="score",required=false) String score,
-    		@RequestParam(value="quiz",required=false) String quiz,
-    		@RequestParam(value="course",required=false) String course
+    		@RequestParam(value="quiz",required=false) String quiz
     		){
         
         try {
@@ -111,10 +131,6 @@ public class QuizResultController {
         	if(quiz!=null) {
         		Quiz q = quizService.findById(quiz);
         		quiz_result.setQuiz(q);
-        	}
-        	if(course!=null) {
-        		Course c = courseService.findById(course);
-            	quiz_result.setCourse(c);
         	}
         	quizResultService.updateQuizResult(quiz_result);
 

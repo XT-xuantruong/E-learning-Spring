@@ -52,6 +52,10 @@ public class User {
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<CourseEnrollment> courseEnrollments = new ArrayList<>();
 	
+	@JsonIgnore
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<QuizResult> quizResults = new ArrayList<>();
+	
 	public User(String id, String firstName, String lastName, String avatar, Role role, String email, String password,
 			Date createdAt, Date updatedAt) {
 		super();
@@ -85,6 +89,14 @@ public class User {
 	
 	public void setCourses(List<Course> courses) {
 		this.courses = courses;
+	}
+
+	public List<QuizResult> getQuizResults() {
+		return quizResults;
+	}
+
+	public void setQuizResults(List<QuizResult> quizResults) {
+		this.quizResults = quizResults;
 	}
 
 	public String getId() {

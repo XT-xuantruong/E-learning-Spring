@@ -1,12 +1,18 @@
 <script setup>
 import questionServices from '@/services/questionServices';
+import quizResultServices from '@/services/quizResultServices';
 import quizServices from '@/services/quizServices';
+import { useUserStore } from '@/stores/user';
 import { ref, computed, onBeforeMount } from 'vue';
 import { useRoute } from 'vue-router'
 const route = useRoute()
 // const categories = ref([])
 const quizList = ref({})
 // const questions = ref([]);
+const user = useUserStore()
+const saveResult = async (result) => {
+    await quizResultServices.create(result)
+}
 const fetchQuiz = async () => {
     await quizServices.get(route.query.q)
         .then(response => {
@@ -44,17 +50,15 @@ const submitQuiz = () => {
         const selectedAnswer = question.answers[question.userAnswer]; // Lấy câu trả lời được chọn
         return acc + (selectedAnswer?.correct ? 1 : 0); // Kiểm tra câu trả lời đúng
     }, 0);
+    const result = {
+        score: score.value,
+        quiz: route.query.q,
+        user: user.user.id
+    }
+
+    saveResult(result)
 
     isSubmitted.value = true;
-};
-
-
-const resetQuiz = () => {
-    quizList.value.questions.forEach(question => {
-        question.userAnswer = null;
-    });
-    score.value = 0;
-    isSubmitted.value = false;
 };
 
 const getOptionClass = (question, optionIndex) => {
@@ -94,10 +98,6 @@ const getOptionClass = (question, optionIndex) => {
                     <p class="mt-2 text-3xl font-bold text-indigo-600">
                         {{ score }} / {{ quizList.questions.length }}
                     </p>
-                    <button @click="resetQuiz"
-                        class="mt-4 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Try Again
-                    </button>
                 </div>
             </div>
 

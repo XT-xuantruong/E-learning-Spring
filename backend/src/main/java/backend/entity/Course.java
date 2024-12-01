@@ -47,10 +47,6 @@ public class Course {
 	@JsonIgnore
 	private List<Quiz> quizzes = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonIgnore
-	private List<QuizResult> quizResults = new ArrayList<>();
-	
 	@OneToMany(mappedBy = "course",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnore
 	private List<Lecture> lectures = new ArrayList<>();
@@ -105,13 +101,6 @@ public class Course {
 		this.lectures = lectures;
 	}
 
-	public List<QuizResult> getQuizResults() {
-		return quizResults;
-	}
-
-	public void setQuizResults(List<QuizResult> quizResults) {
-		this.quizResults = quizResults;
-	}
 
 	public List<Quiz> getQuizzes() {
 		return quizzes;

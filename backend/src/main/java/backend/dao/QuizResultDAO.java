@@ -10,4 +10,5 @@ public interface QuizResultDAO {
     public void createQuizResult(QuizResult theQuizResult);
     public void updateQuizResult(QuizResult theQuizResult);
     public void deleteById(String id);
+    public List<QuizResult> getListQuizResultbyUser(String id);
 }
