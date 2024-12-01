@@ -29,6 +29,16 @@ class CourseEnrollmentServices extends ApiService {
       data: data,
     });
   }
+  async getbyuser(params) {
+    console.log(1);
+
+    const option = {
+      method: "get",
+      url: `/${this.entity}/get-by-user`,
+      params: { ...params },
+    };
+    return this.request(option);
+  }
 
   // async delete(id) {
   //   const adminStore = useAdminStore();

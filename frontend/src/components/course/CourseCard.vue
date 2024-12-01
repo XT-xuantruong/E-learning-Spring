@@ -17,9 +17,13 @@
 
             <div class="mt-4 flex items-center justify-between border-t pt-4">
                 <p class="text-xl font-bold">{{ formatPrice(course.price) }}</p>
-                <button @click="proceedToCheckout"
+                <button v-if="check == false" @click="proceedToCheckout"
                     class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                     Đăng ký
+                </button>
+                <button v-else @click="toStudy"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    Tiếp tục học
                 </button>
             </div>
         </div>
@@ -27,16 +31,22 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, onBeforeMount, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useOrderStore } from '@/stores/order';
+import { useUserStore } from '@/stores/user';
 
 const router = useRouter();
 const orderStore = useOrderStore();
+const user = useUserStore()
 const props = defineProps({
     course: {
         type: Object,
         required: true,
+    },
+    check: {
+        type: Boolean,
+        default: false,
     }
 });
 
@@ -45,11 +55,14 @@ const proceedToCheckout = () => {
     orderStore.addItem(props.course);  // Thêm khóa học vào giỏ hàng
     router.push("/checkout");  // Chuyển hướng đến trang thanh toán
 };
-
+const toStudy = () => {
+    router.push({ name: "study", query: { course: props.course.id } });
+};
 const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', {
         style: 'currency',
         currency: 'VND'
     }).format(price);
 };
+
 </script>

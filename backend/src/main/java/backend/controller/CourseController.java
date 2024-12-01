@@ -8,6 +8,7 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import backend.dto.CourseDTO;
 import backend.entity.Category;
 import backend.entity.Course;
 import backend.entity.User;
@@ -66,6 +67,23 @@ public class CourseController {
                 return ResponseEntity.notFound().build();
             }
             ApiResponse<Course> response = new ApiResponse<>("ok", "Successfully", course);
+            return ResponseEntity.ok(response);
+    	} catch (Exception e) {
+    		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+    				.body(new ApiResponse<>("error", e.getMessage(), null));
+    	}
+    }
+    @GetMapping("/get-more/{id}")
+    public ResponseEntity<ApiResponse<CourseDTO>> getCourseByIdWithLectureAndQuiz(
+    		@PathVariable String id) {
+    	try {
+
+    		CourseDTO course = courseService.findByIdWithLectureAndQuiz(id);
+    		System.out.print(course);
+            if (course == null) {
+                return ResponseEntity.notFound().build();
+            }
+            ApiResponse<CourseDTO> response = new ApiResponse<CourseDTO>("ok", "Successfully", course);
             return ResponseEntity.ok(response);
     	} catch (Exception e) {
     		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

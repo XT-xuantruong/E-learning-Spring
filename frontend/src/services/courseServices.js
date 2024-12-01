@@ -5,6 +5,12 @@ class CourseServices extends ApiService {
   get entity() {
     return "courses";
   }
+  async getMoreDetail(id) {
+    return this.request({
+      method: "get",
+      url: `/${this.entity}/get-more/${id}`,
+    });
+  }
   // async update(data) {
   //   // const adminStore = useAdminStore();
   //   // console.log(adminStore.admin.isAuthenticated, adminStore.admin.access);

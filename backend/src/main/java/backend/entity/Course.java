@@ -43,7 +43,7 @@ public class Course {
 	@JsonIgnore
 	private List<CourseEnrollment> courseEnrollments = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "course",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnore
 	private List<Quiz> quizzes = new ArrayList<>();
 	
@@ -51,7 +51,7 @@ public class Course {
 	@JsonIgnore
 	private List<QuizResult> quizResults = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "course",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnore
 	private List<Lecture> lectures = new ArrayList<>();
 		

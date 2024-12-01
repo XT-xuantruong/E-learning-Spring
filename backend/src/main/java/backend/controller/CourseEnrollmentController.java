@@ -69,6 +69,39 @@ public class CourseEnrollmentController {
     				.body(new ApiResponse<>("error", e.getMessage(), null));
     	}
     }
+    @GetMapping(value = "/get-by-user", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse<List<CourseEnrollment>>> getCourseByUser(
+            @RequestParam("userId") String userId) {
+        try {
+            // Log request details
+            System.out.println("User ID: " + userId);
+
+            // Validate input parameters
+            if (userId.isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>("error", "userId are required", null));
+            }
+
+            // Get course enrollment
+            List<CourseEnrollment> courseEnrollment = courseEnrollmentService.findByUserAndCourse(userId);
+
+         // Handle case when no enrollments are found
+            if (courseEnrollment == null || courseEnrollment.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>("error", "No course enrollments found for user: " + userId, null));
+            }
+
+            // Return successful response
+            ApiResponse<List<CourseEnrollment>> response = new ApiResponse<>("ok", "Successfully retrieved", courseEnrollment);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            // Log exception details
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse<>("error", "An unexpected error occurred: " + e.getMessage(), null));
+        }
+    }
 
     @PostMapping()
     public ResponseEntity<ApiResponse<CourseEnrollment>> createCourseEnrollment(

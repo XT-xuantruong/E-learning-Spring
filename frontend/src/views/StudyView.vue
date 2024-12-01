@@ -1,17 +1,18 @@
 <template>
     <DefaultLayout>
         <!-- Progress Section -->
-        <CourseProgress :course="currentCourse" :completedLessons="completedLessons" :totalLessons="lessons.length" />
+        <CourseProgress :course="currentCourse" :completedLessons="completedLessons"
+            :totalLessons="lessons?.length || 0" />
 
         <div class="grid grid-cols-3">
             <!-- PDF Viewer Section -->
             <div class="m-5 p-5 bg-white border rounded col-span-2">
-                <PdfViewer :pdfUrl="pdfUrl" :currentIndex="currentIndex" :lessons="lessons" @prev="prevPdf"
+                <PdfViewer :pdfUrl="pdfUrl" :currentIndex="currentIndex" :lessons="lessons || []" @prev="prevPdf"
                     @next="nextPdf" />
             </div>
 
             <!-- Lessons List Section -->
-            <LessonsList :quizs="quizInCourse" :lessons="lessons" :currentIndex="currentIndex"
+            <LessonsList :quizs="quizInCourse || []" :lessons="lessons || []" :currentIndex="currentIndex"
                 :completedLessons="completedLessons" @select-lesson="selectPdf" />
         </div>
     </DefaultLayout>
@@ -21,132 +22,102 @@
 import { ref, computed, onMounted, watch, onBeforeMount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import DefaultLayout from '@/layouts/user/DefaultLayout.vue';
-// import lectures from '@/faker/lectures';
-// import courses from '@/faker/course';
 import CourseProgress from '@/components/course/CourseProgress.vue';
 import PdfViewer from '@/components/pdf/PdfViewer.vue';
 import LessonsList from '@/components/course/LessonsList.vue';
 import courseServices from '@/services/courseServices';
-import lectureServices from '@/services/lectureServices';
-import quizServices from '@/services/quizServices';
+import courseEnrollmentServices from '@/services/courseEnrollmentServices';
+import { useUserStore } from '@/stores/user';
 
 // Router setup
 const route = useRoute();
 const router = useRouter();
-const courseId = route.query.course
-const lectures = ref([])
-const quizs = ref([])
-const currentCourse = ref({})
-// Lấy danh sách bài giảng của khóa học
+const user = useUserStore()
+const courseId = route.query.course;
+const currentCourse = ref({
+    lectures: [],
+    quizs: []
+});
+const course = ref({})
+
+// Computed properties with null checks
 const lessons = computed(() => {
+    if (!currentCourse.value?.lectures) return [];
+    return [...currentCourse.value.lectures].sort((a, b) => a.title.localeCompare(b.title));
+});
 
-    return lectures.value = lectures.value
-        .filter(lecture => lecture.course.id == courseId)
-        .sort((a, b) => a.title.localeCompare(b.title));
-})
 const quizInCourse = computed(() => {
+    if (!currentCourse.value?.quizs) return [];
+    return [...currentCourse.value.quizs].sort((a, b) => a.title.localeCompare(b.title));
+});
 
-    return quizs.value = quizs.value
-        .filter(quiz => quiz.course.id == courseId)
-        .sort((a, b) => a.title.localeCompare(b.title));
-})
-const fetchCourse = async () => {
-    await courseServices.get(courseId)
-        .then(response => {
-            currentCourse.value = response.data.data
-        })
-        .catch(error => {
-            console.error(error)
-        })
-}
-const fetchQuiz = async () => {
-    await quizServices.gets()
-        .then(response => {
-            quizs.value = response.data.data
-        })
-        .catch(error => {
-            console.error(error)
-        })
-}
-const fetchLecture = async () => {
-    await lectureServices.gets()
-        .then(response => {
-            lectures.value = response.data.data
-        })
-        .catch(error => {
-            console.error(error)
-        })
-}
-onBeforeMount(() => {
-    fetchCourse()
-    fetchLecture()
-    fetchQuiz()
-})
 // State
 const currentIndex = ref(-1);
 const pdfUrl = ref('');
 const completedLessons = ref(2);
 
+// Fetch course data
+const fetchCourse = async () => {
+    try {
+        const response = await courseServices.getMoreDetail(courseId);
+        currentCourse.value = response.data.data;
+
+        // Initialize first lesson if available
+        if (lessons.value.length > 0 && currentIndex.value === -1) {
+            const lessonId = route.query.lesson;
+            if (lessonId) {
+                const index = findLessonIndex(lessonId);
+                if (index !== -1) {
+                    selectPdf(index);
+                }
+            } else {
+                // If no lesson ID, start from the last completed lesson + 1
+                const nextLessonIndex = Math.min(completedLessons.value, lessons.value.length - 1);
+                selectPdf(nextLessonIndex);
+                updateRoute(nextLessonIndex);
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching course:', error);
+        // You might want to add error handling UI here
+    }
+};
+const fetchCourseByUser = async () => {
+    await courseEnrollmentServices.getbyuser({ userId: user.user.id })
+        .then(response => {
+            course.value = response.data.data.find(c => c.course.id === route.query.course)
+
+            console.log(course.value);
+
+        })
+        .catch(error => {
+            console.error(error)
+        })
+}
 
 // Find lesson index by ID
 const findLessonIndex = (lessonId) => {
-    return lessons.value.findIndex(lesson => lesson.id == lessonId);
+    return lessons.value.findIndex(lesson => lesson.id === lessonId);
 };
-
-
-// Lifecycle hooks
-onMounted(() => {
-    // If there's a lesson ID in the query, select that lesson
-    const lessonId = route.query.lesson;
-    if (lessonId) {
-        const index = findLessonIndex(lessonId);
-        if (index !== -1) {
-            selectPdf(index);
-        }
-    } else if (lessons.value?.length > 0) {
-        // If no lesson ID, start from the last completed lesson + 1
-        const nextLessonIndex = Math.min(completedLessons.value, lessons.value.length - 1);
-        selectPdf(nextLessonIndex);
-        updateRoute(nextLessonIndex);
-    }
-});
-
-// Watch for route changes
-watch(
-    () => route.query.lesson,
-    (newLessonId) => {
-        if (newLessonId) {
-            const index = findLessonIndex(newLessonId);
-            if (index !== -1 && index !== currentIndex.value) {
-                selectPdf(index);
-            }
-        }
-    }
-);
 
 // Methods
 const selectPdf = (index) => {
-    currentIndex.value = index;
-    pdfUrl.value = "http://localhost:8092/backend" + lessons.value[index]?.content;
+    if (lessons.value[index]) {
+        currentIndex.value = index;
+        pdfUrl.value = `http://localhost:8092/backend${lessons.value[index].content}`;
+    }
 };
 
 const nextPdf = () => {
     if (currentIndex.value < lessons.value.length - 1) {
-        // Move to next lesson
         selectPdf(currentIndex.value + 1);
-
-        // Update completed lessons
         if (currentIndex.value > completedLessons.value) {
             completedLessons.value = currentIndex.value;
         }
-
-        // If this is the last lesson, mark it as completed when reached
         if (currentIndex.value === lessons.value.length - 1) {
             completedLessons.value = lessons.value.length;
         }
-
         updateRoute();
-
     }
 };
 
@@ -158,12 +129,30 @@ const prevPdf = () => {
 };
 
 const updateRoute = () => {
-    router.push({
-        name: 'study',
-        query: {
-            ...route.query,
-            lesson: lessons.value[currentIndex.value].id
-        }
-    });
+    if (lessons.value[currentIndex.value]) {
+        router.push({
+            name: 'study',
+            query: {
+                ...route.query,
+                lesson: lessons.value[currentIndex.value].id
+            }
+        });
+    }
 };
+
+// Lifecycle hooks
+onBeforeMount(() => {
+    fetchCourse()
+    fetchCourseByUser()
+});
+
+// Watch for route changes
+watch(() => route.query.lesson, (newLessonId) => {
+    if (newLessonId && lessons.value.length > 0) {
+        const index = findLessonIndex(newLessonId);
+        if (index !== -1 && index !== currentIndex.value) {
+            selectPdf(index);
+        }
+    }
+});
 </script>

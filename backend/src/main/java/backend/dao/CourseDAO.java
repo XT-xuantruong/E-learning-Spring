@@ -2,6 +2,7 @@ package backend.dao;
 
 import java.util.List;
 
+import backend.dto.CourseDTO;
 import backend.entity.Course;
 
 public interface CourseDAO {
@@ -10,4 +11,5 @@ public interface CourseDAO {
     public void createCourse(Course theCourse);
     public void updateCourse(Course theCourse);
     public void deleteById(String id);
+    public CourseDTO findByIdWithLectureAndQuiz(String id);
 }

@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import backend.dao.CourseDAO;
+import backend.dto.CourseDTO;
+import backend.dto.QuizDetailsDTO;
 import backend.entity.Course;
 
 @Service
@@ -41,5 +43,12 @@ public class CourseServiceImpl implements CourseService{
 	public void deleteById(String id) {
 		courseDAO.deleteById(id);
 	}
+
+	@Override
+	public CourseDTO findByIdWithLectureAndQuiz(String id) {
+		return courseDAO.findByIdWithLectureAndQuiz(id);
+	}
+
+
 
 }
