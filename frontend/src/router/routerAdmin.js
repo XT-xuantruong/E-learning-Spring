@@ -4,7 +4,6 @@ import CourseManagement from "@/views/CourseManagementView.vue";
 import CategoryCourse from "@/views/CategoryCourseView.vue";
 import QuizList from "@/views/QuizListView.vue";
 import QAManagement from "@/views/QAManagementView.vue";
-import ReviewManagement from "@/views/ReviewManagementView.vue";
 import ScopeManagement from "@/views/ScopeManagementView.vue";
 import LectureManagement from "@/views/LectureManagementView.vue";
 import StudentManagement from "@/views/StudentManagementView.vue";
@@ -82,14 +81,7 @@ export const adminRoutes = [
           title: "QAManagement",
         },
       },
-      {
-        path: "review",
-        name: "ReviewManagement",
-        component: ReviewManagement,
-        meta: {
-          title: "ReviewManagement",
-        },
-      },
+     
       {
         path: "users/student-management",
         name: "StudentManagement",

@@ -261,8 +261,17 @@ const formatDate = (date) => {
 };
 
 // Lifecycle hooks
-onMounted(() => {
-  // Fetch data from API or use demo data
+onMounted( async () => {
+  await courseServices.gets().then((response) => {
+    const data = response.data.data;
+
+    data.forEach((element) => {
+      element.category_id = element.category_id.id;
+      element.thumbnail = "http://localhost:8092/backend" + element.thumbnail;
+    });
+
+    courses.value = data;
+  });
 });
 
 const closeModal = () => {

@@ -40,7 +40,7 @@
                   type="text"
                   v-model="searchQuery"
                   placeholder="Search..."
-                  class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 "
+                  class="pl-10 pr-4 py-2 rounded-lg border border-gray-200"
                 />
               </div>
             </div>
@@ -205,7 +205,7 @@
                     :key="category.id"
                     :value="category.id"
                   >
-                    {{ category.name }}
+                    {{ category.title }}
                   </option>
                 </select>
               </div>
@@ -234,36 +234,16 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, onBeforeMount } from "vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
+import categoryServices from "@/services/categoryServices";
+import courseServices from "@/services/courseServices";
 
 // Categories data
-const categories = ref([
-  { id: 1, name: "Lập trình Web" },
-  { id: 2, name: "Lập trình Mobile" },
-  { id: 3, name: "Cơ sở dữ liệu" },
-  { id: 4, name: "DevOps" },
-]);
+const categories = ref([]);
 
 // Course data
-const courses = ref([
-  {
-    id: 1,
-    title: "Vue.js Cơ bản",
-    description:
-      "Khóa học Vue.js cho người mới bắt đầu với các khái niệm cơ bản và thực hành",
-    thumbnail: "https://picsum.photos/200",
-    category_id: 1,
-  },
-  {
-    id: 2,
-    title: "React Native Master",
-    description:
-      "Học phát triển ứng dụng di động với React Native từ cơ bản đến nâng cao",
-    thumbnail: "https://picsum.photos/200",
-    category_id: 2,
-  },
-]);
+const courses = ref([]);
 
 const showModal = ref(false);
 const isEditing = ref(false);
@@ -272,11 +252,7 @@ const selectedFile = ref(null);
 const searchQuery = ref("");
 
 const formData = reactive({
-  id: null,
-  title: "",
-  description: "",
-  thumbnail: "",
-  category_id: "",
+  price: 30000,
 });
 
 const filteredCourses = computed(() => {
@@ -296,7 +272,8 @@ const handleImageChange = (event) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       imagePreview.value = e.target.result;
-      formData.thumbnail = e.target.result; // Store base64 image
+      formData.thumbnail = e.target.result;
+      formData.file = file;
     };
     reader.readAsDataURL(file);
   }
@@ -310,12 +287,11 @@ const removeImage = () => {
 
 const getCategoryName = (categoryId) => {
   const category = categories.value.find((c) => c.id === categoryId);
-  return category ? category.name : "Không có danh mục";
+  return category ? category.title : "Không có danh mục";
 };
 
 const openAddModal = () => {
   isEditing.value = false;
-  resetForm();
   showModal.value = true;
 };
 
@@ -345,13 +321,21 @@ const resetForm = () => {
   selectedFile.value = null;
 };
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (isEditing.value) {
-    const index = courses.value.findIndex((c) => c.id === formData.id);
-    if (index !== -1) {
-      courses.value[index] = { ...formData };
-    }
+    await courseServices.update(formData).then((res) => {
+      const data = res.data.data;
+      console.log(data);
+
+      formData.category_id = data.category_id.id;
+      const index = courses.value.findIndex((c) => c.id === formData.id);
+
+      if (index !== -1) {
+        courses.value[index] = { ...formData };
+      }
+    });
   } else {
+    await courseServices.create(formData);
     const newCourse = {
       ...formData,
       id: Math.max(0, ...courses.value.map((c) => c.id)) + 1,
@@ -361,9 +345,29 @@ const handleSubmit = () => {
   closeModal();
 };
 
-const deleteCourse = (id) => {
+const deleteCourse = async (id) => {
   if (confirm("Bạn có chắc chắn muốn xóa khóa học này?")) {
+    await courseServices.delete(id);
     courses.value = courses.value.filter((course) => course.id !== id);
   }
 };
+
+onBeforeMount(async () => {
+  await categoryServices.gets().then((response) => {
+    const data = response.data.data;
+
+    categories.value = data;
+  });
+
+  await courseServices.gets().then((response) => {
+    const data = response.data.data;
+
+    data.forEach((element) => {
+      element.category_id = element.category_id.id;
+      element.thumbnail = "http://localhost:8092/backend" + element.thumbnail;
+    });
+
+    courses.value = data;
+  });
+});
 </script>

@@ -171,19 +171,7 @@
           </div>
         </div>
 
-        <!-- Review -->
-        <router-link
-          to="/admin/review"
-          class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200"
-          :class="[
-            $route.path === '/review'
-              ? 'bg-slate-700 text-emerald-400'
-              : 'hover:bg-slate-700/50',
-          ]"
-        >
-          <i class="fas fa-shopping-cart w-5"></i>
-          <span class="ml-3 text-sm font-medium">Review Management</span>
-        </router-link>
+       
 
         <!-- User -->
         <div class="space-y-2">

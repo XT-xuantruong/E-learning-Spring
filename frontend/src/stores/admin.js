@@ -79,9 +79,9 @@ export const useAdminStore = defineStore("admin", {
     },
 
     setAdminInfo(admin) {
-      console.log("setadminInfo", admin._id);
+      console.log("setadminInfo", admin.id);
 
-      this.admin.id = admin._id;
+      this.admin.id = admin.id;
       this.admin.name = admin.name;
       this.admin.email = admin.email;
       // this.admin.avatar = admin.avatar;

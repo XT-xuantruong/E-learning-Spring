@@ -77,26 +77,25 @@ public class CourseController {
     public ResponseEntity<ApiResponse<Course>> createCourse(
     		@RequestParam("title") String title,
     	    @RequestParam("description") String description,
-    	    @RequestParam("thumbnail") MultipartFile  thumbnail,
+    	    @RequestParam("file") MultipartFile file,
     	    @RequestParam("createBy") String createBy,
-    	    @RequestParam("category") String category,
+    	    @RequestParam("category_id") String category_id,
     	    @RequestParam("price") String price
     ) {
         
         try {
         	String projectPath = context.getRealPath("resources/");
         	Path uploadPath = Paths.get(projectPath, "images", "thumbnail").toAbsolutePath();
-        	System.out.print(projectPath);
-        	if (thumbnail.isEmpty()) {
+        	if (file.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 		.body(new ApiResponse<>("error", "thumbnail invalid", null));
             }
         	
-        	String fileName = UUID.randomUUID().toString() + "_" + thumbnail.getOriginalFilename();
+        	String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+
             Path filePath = uploadPath.resolve(fileName);
-            Files.copy(thumbnail.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
             String fileUrl = "/resources/images/thumbnail/" + fileName;
-            
         	Course course = new Course();
             course.setTitle(title);
             course.setDescription(description);
@@ -105,7 +104,7 @@ public class CourseController {
             User user = userService.findById(createBy);
             course.setCreate_by(user);
             
-            Category cate = categoryService.findById(category);
+            Category cate = categoryService.findById(category_id);
             course.setCategory_id(cate);
             
             course.setPrice(Float.parseFloat(price));
@@ -124,14 +123,16 @@ public class CourseController {
     @PutMapping(value ="/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<Course>> updateCourse(
     		@PathVariable String id, 
-    		@RequestParam(value ="title", required = false) String title,
-    	    @RequestParam(value ="description", required = false) String description,
-    	    @RequestParam(value ="thumbnail", required = false) MultipartFile  thumbnail,
-    	    @RequestParam(value ="createBy", required = false) String createBy,
-    	    @RequestParam(value ="category", required = false) String category
+    		@RequestParam("title") String title,
+    	    @RequestParam("description") String description,
+    	    @RequestParam("file") MultipartFile file,
+    	    @RequestParam("createBy") String createBy,
+    	    @RequestParam("category_id") String category_id,
+    	    @RequestParam("price") String price
     ){
         
         try {
+
         	String projectPath = context.getRealPath("resources/");
         	Path uploadPath = Paths.get(projectPath, "images", "thumbnail").toAbsolutePath();
         	
@@ -149,10 +150,10 @@ public class CourseController {
             	course.setDescription(description);
             }
             
-            if(thumbnail !=null) {
-            	String fileName = UUID.randomUUID().toString() + "_" + thumbnail.getOriginalFilename();
+            if(file !=null) {
+            	String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
                 Path filePath = uploadPath.resolve(fileName);
-                Files.copy(thumbnail.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
                 String fileUrl = "/resources/images/thumbnail/" + fileName;
                 
                 course.setThumbnail(fileUrl);
@@ -162,10 +163,14 @@ public class CourseController {
             	User user = userService.findById(createBy);
                 course.setCreate_by(user);
             }
-            if(category!=null) {
-            	Category cate = categoryService.findById(category);
+            if(category_id!=null) {
+            	Category cate = categoryService.findById(category_id);
+                System.out.println("long ngon "+cate);
+
                 course.setCategory_id(cate);
             }
+            
+            course.setPrice(Float.parseFloat(price));
                            
             courseService.updateCourse(course);
             ApiResponse<Course> response = new ApiResponse<>("ok", "Successfully", course);
