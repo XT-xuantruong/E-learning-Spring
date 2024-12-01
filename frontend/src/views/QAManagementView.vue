@@ -325,7 +325,7 @@
                         <font-awesome-icon :icon="['fas', 'pen']" />
                       </button>
                       <button
-                        @click="deleteQuestion(index, quiz)"
+                        @click="deleteQuestion(question.id, quiz)"
                         class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md hover:bg-red-100 transition-colors duration-200"
                       >
                         <font-awesome-icon :icon="['fas', 'trash']" />
@@ -343,9 +343,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onBeforeMount } from "vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import * as XLSX from "xlsx";
+import quizServices from "@/services/quizServices";
+import questionServices from "@/services/questionServices";
+import answerServices from "@/services/answerServices";
 
 const quizzes = ref([
   {
@@ -372,59 +375,13 @@ const quizzes = ref([
           },
         ],
       },
-      {
-        question: 'Which planet is known as the "Red Planet"?',
-        answers: [
-          {
-            answer_text: "Pacific Ocean",
-            is_correct: false,
-          },
-          {
-            answer_text: "Pacific Ocean",
-            is_correct: false,
-          },
-          {
-            answer_text: "Indian Ocean",
-            is_correct: false,
-          },
-          {
-            answer_text: "Arctic Ocean",
-            is_correct: true,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    name: "Quiz Place 2",
-    questions: [
-      {
-        question: "What is the largest ocean on Earth?",
-        answers: [
-          {
-            answer_text: "Pacific Ocean",
-            is_correct: false,
-          },
-          {
-            answer_text: "Pacific Ocean",
-            is_correct: false,
-          },
-          {
-            answer_text: "Indian Ocean",
-            is_correct: false,
-          },
-          {
-            answer_text: "Arctic Ocean",
-            is_correct: true,
-          },
-        ],
-      },
     ],
   },
 ]);
 
 const newQuestion = ref("");
-const newAnswers = ref([{answer_text: "", is_correct: false}]);
+const questionID = ref("");
+const newAnswers = ref([{ answer_text: "", is_correct: false }]);
 const newCorrectAnswerIndex = ref(0);
 const editingIndex = ref(-1);
 const editingQuiz = ref(null);
@@ -531,7 +488,6 @@ const confirmImport = () => {
   console.log("long");
 
   console.log(quizzes);
-  // Reset import form
   cancelImport();
 };
 
@@ -551,26 +507,60 @@ const add = () => {
   isModalOpen.value = true;
 };
 
-const addQuestion = () => {
+const addQuestion = async () => {
   if (!newQuestion.value || newAnswers.value.some((answer) => !answer)) {
     alert("Please fill in all fields");
     return;
   }
+  await questionServices
+    .create({
+      question_text: newQuestion.value,
+      quiz: currentQuiz.value.id,
+    })
+    .then((res) => {
+      const data = res.data.data;
+      newAnswers.value.forEach(async (answer, index) => {
+        await answerServices.create({
+          question: data.id,
+          answer_text: answer.answer_text,
+          is_correct: newCorrectAnswerIndex.value == index ? true : false,
+        });
 
-  newAnswers.value.forEach((answer, index) => {
-    newAnswers.value[index] = {
-      answer_text: answer.answer_text,
-      is_correct: newCorrectAnswerIndex.value == index ? true : false,
+        newAnswers.value[index] = {
+          answer_text: answer.answer_text,
+          is_correct: newCorrectAnswerIndex.value == index ? true : false,
+        };
+        console.log(newCorrectAnswerIndex);
+      });
+    });
+
+  if (currentQuiz.value && currentQuiz.value.questions) {
+    currentQuiz.value.questions.push({
+      question: newQuestion.value,
+      answers: [...newAnswers.value],
+    });
+  } else {
+    currentQuiz.value = {
+      ...currentQuiz.value,
+      questions: [
+        {
+          question: newQuestion.value,
+          answers: [...newAnswers.value],
+        },
+      ],
     };
-    console.log(newCorrectAnswerIndex);
-    
-  });
+  }
 
-  currentQuiz.value.questions.push({
-    question: newQuestion.value,
-    answers: [...newAnswers.value],
-  });
+  const quizIndex = quizzes.value.findIndex(
+    (q) => q.id === currentQuiz.value.id
+  );
+  console.log("long ", quizzes.value);
+
+  quizzes.value[quizIndex] = { ...currentQuiz.value };
+
   quizzes.value = [...quizzes.value];
+  console.log(quizzes.value);
+
   clearNewQuestionForm();
   isModalOpen.value = false;
 };
@@ -578,26 +568,48 @@ const addQuestion = () => {
 const editQuestion = (index, quiz) => {
   editingIndex.value = index;
   editingQuiz.value = quiz;
+  questionID.value = quiz.questions[index].id;
   newQuestion.value = quiz.questions[index].question;
   newAnswers.value = [...quiz.questions[index].answers];
   isModalOpen.value = true;
 };
 
-const updateQuestion = () => {
+const updateQuestion = async () => {
   if (!newQuestion.value || newAnswers.value.some((answer) => !answer)) {
     alert("Please fill in all fields");
     return;
   }
-  quizzes
+  quizzes;
 
-  newAnswers.value.forEach((answer, index) => {
-    newAnswers.value[index] = {
-      answer_text: answer.answer_text,
-      is_correct: newCorrectAnswerIndex.value == index ? true : false,
-    };
-    
-  });
-  
+  await questionServices
+    .update({
+      id: questionID.value,
+      question_text: newQuestion.value,
+      quiz: currentQuiz.value.id,
+    })
+    .then((res) => {
+      const data = res.data.data;
+
+      newAnswers.value.forEach(async (answer, index) => {
+        if (!answer.id) {
+          await answerServices.create({
+            question: data.id,
+            answer_text: answer.answer_text,
+            is_correct: newCorrectAnswerIndex.value == index ? true : false,
+          });
+        } else {
+          await answerServices.update({
+            id: answer.id,
+            answer_text: answer.answer_text,
+            is_correct: newCorrectAnswerIndex.value == index ? true : false,
+          });
+        }
+        newAnswers.value[index] = {
+          answer_text: answer.answer_text,
+          is_correct: newCorrectAnswerIndex.value == index ? true : false,
+        };
+      });
+    });
 
   currentQuiz.value.questions[editingIndex.value] = {
     question: newQuestion.value,
@@ -610,8 +622,9 @@ const updateQuestion = () => {
   isModalOpen.value = false;
 };
 
-const deleteQuestion = (index, quiz) => {
+const deleteQuestion = async (index, quiz) => {
   if (confirm("Are you sure you want to delete this question?")) {
+    await questionServices.delete(index);
     quiz.questions.splice(index, 1);
     quizzes.value = [...quizzes.value];
   }
@@ -637,4 +650,50 @@ const removeAnswerField = (index) => {
     newAnswers.value = newAnswersArray;
   }
 };
+
+onBeforeMount(async () => {
+  try {
+    const [answersResponse, questionsResponse, quizzesResponse] =
+      await Promise.all([
+        answerServices.gets().then(),
+        questionServices.gets(),
+        quizServices.gets(),
+      ]);
+
+    const answers = [...answersResponse.data.data];
+    const questions = [...questionsResponse.data.data];
+    const quizData = quizzesResponse.data.data;
+
+    answers.forEach((answer) => {
+      answer.answer_text = answer.answerText;
+      answer.is_correct = answer.correct;
+    });
+
+    questions.forEach((question) => {
+      question.question = question.questionText;
+    });
+
+    quizzes.value = quizData.map((element) => {
+      const questionOfQuiz = questions.filter(
+        (question) => question.quiz.id === element.id
+      );
+
+      questionOfQuiz.forEach((question) => {
+        const answerOfQuestion = answers.filter(
+          (answer) => answer.question.id === question.id
+        );
+        question.answers = answerOfQuestion;
+      });
+
+      return {
+        ...element,
+        name: element.title,
+        course_id: element.course.id,
+        questions: questionOfQuiz,
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+});
 </script>

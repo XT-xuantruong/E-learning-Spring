@@ -1,60 +1,61 @@
 import ApiService from "./ApiService";
-// import { useAdminStore } from "@/stores/admin";
+import { useAdminStore } from "@/stores/admin";
 
 class AnswerServices extends ApiService {
   get entity() {
     return "answer";
   }
-  // async update(data) {
-  //   // const adminStore = useAdminStore();
-  //   // console.log(adminStore.admin.isAuthenticated, adminStore.admin.access);
-  //   // console.log(data);
+  async update(data) {
+    const adminStore = useAdminStore();
+    const { id } = data;
+    const option = {
+      method: "put",
+      url: `/${this.entity}/${id}`,
+      data: data,
+      headers: {
+        Authorization: `Bearer ${adminStore.admin.access}`,
+        "Content-Type": "multipart/form-data",
+      },
+    };
+    return this.request(option);
+  }
 
-  //   const { _id } = data;
-  //   const option = {
-  //     method: "put",
-  //     url: `/${this.entity}/${_id}/`,
-  //     data: data,
-  //     // headers: {
-  //     //   Authorization: `Bearer ${adminStore.admin.access}`,
-  //     // },
-  //   };
-  //   return this.request(option);
-  // }
+  async create(data) {
+    console.log(data);
+    
+    const adminStore = useAdminStore();
+    return this.request({
+      method: "post",
+      url: `/${this.entity}`,
+      headers: {
+        Authorization: `Bearer ${adminStore.admin.access}`,
+        "Content-Type": "multipart/form-data",
+      },
+      data: data,
+    });
+  }
 
-  // async create(data) {
-  //   const adminStore = useAdminStore();
-  //   const formData = new FormData();
+  async gets() {
+    const adminStore = useAdminStore();
+    return this.request({
+      method: "get",
+      url: `/${this.entity}`,
+      headers: {
+        Authorization: `Bearer ${adminStore.admin.access}`,
+      },
+    });
+  }
 
-  //   formData.append("name", data.name);
-  //   formData.append("thumbnail", data.thumbnail);
-  //   formData.append("images", data.images);
-  //   formData.append("price", data.price);
-  //   formData.append("description", data.description);
-  //   formData.append("category", data.category);
-  //   formData.append("countInStock", data.countInStock);
-  //   const option = {
-  //     method: "post",
-  //     url: `/${this.entity}/`,
-  //     data: data,
-  //     // headers: {
-  //     //   "Content-Type": "multipart/form-data",
-  //     //   Authorization: `Bearer ${adminStore.admin.access}`,
-  //     // },
-  //   };
-  //   return this.request(option);
-  // }
-
-  // async delete(id) {
-  //   const adminStore = useAdminStore();
-  //   return this.request({
-  //     method: "delete",
-  //     url: `/${this.entity}/${id}/`,
-  //     headers: {
-  //       Authorization: `Bearer ${adminStore.admin.access}`,
-  //     },
-  //   });
-  // }
+  async delete(id) {
+    const adminStore = useAdminStore();
+    return this.request({
+      method: "delete",
+      url: `/${this.entity}/${id}`,
+      headers: {
+        Authorization: `Bearer ${adminStore.admin.access}`,
+      },
+    });
+  }
 }
 
 export default new AnswerServices();

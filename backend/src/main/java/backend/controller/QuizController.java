@@ -57,12 +57,12 @@ public class QuizController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<Quiz>> createQuiz(
     		@RequestParam("title") String title,
-    		@RequestParam("course") String course
+    		@RequestParam("course_id") String course_id
     	    ) {      
         try {
         	Quiz quiz = new Quiz();
         	quiz.setTitle(title);
-        	Course c = courseService.findById(course);
+        	Course c = courseService.findById(course_id);
         	quiz.setCourse(c);
         	quizService.createQuiz(quiz);
             ApiResponse<Quiz> response = new ApiResponse<>("ok", "Successfully", quiz);
@@ -78,7 +78,7 @@ public class QuizController {
     public ResponseEntity<ApiResponse<Quiz>> updateQuiz(
     		@PathVariable String id, 
     		@RequestParam(value="title",required=false) String title,
-    		@RequestParam(value="course",required=false) String course
+    		@RequestParam(value="course_id",required=false) String course_id
     		){
         
         try {
@@ -90,8 +90,8 @@ public class QuizController {
         	if(title != null) {
         		quiz.setTitle(title);
         	}
-        	if(course!=null) {
-        		Course c = courseService.findById(course);
+        	if(course_id!=null) {
+        		Course c = courseService.findById(course_id);
             	quiz.setCourse(c);
         	}
             quizService.updateQuiz(quiz);

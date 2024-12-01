@@ -2,14 +2,10 @@
 import { onBeforeMount, ref } from "vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import lectureServices from "@/services/lectureServices";
+import courseServices from "@/services/courseServices";
 
 // Add courses data
-const courses = ref([
-  { id: "VUE101", name: "Vue.js Fundamentals" },
-  { id: "VUE102", name: "Advanced Vue.js" },
-  { id: "VUE103", name: "Vue.js State Management" },
-  { id: "VUE104", name: "Vue.js Testing" },
-]);
+const courses = ref([]);
 
 const lectures = ref([]);
 
@@ -61,6 +57,7 @@ const closePdfViewer = () => {
   isPdfViewerOpen.value = false;
 };
 
+
 const updateLecture = async () => {
   await lectureServices.update(formData.value).then((Response) => {
     console.log(Response);
@@ -108,8 +105,6 @@ const deleteLecture = async (lectureId) => {
     });
     lectures.value = lectures.value.filter((l) => l.id !== lectureId);
   }
-
-
 };
 
 const openEditModal = (lecture) => {
@@ -148,22 +143,32 @@ const handleSubmit = async () => {
 
 const getCourseName = (courseId) => {
   const course = courses.value.find((c) => c.id === courseId);
-  return course ? course.name : courseId;
+  return course ? course.title : courseId;
 };
 
 onBeforeMount(async () => {
   await lectureServices.gets().then((response) => {
     const data = response.data.data;
     data.forEach((element) => {
-    
-      element.date=element.createdAt
+      element.course_id = element.course.id;
+      element.date = element.createdAt;
       element.pdfUrl = "http://localhost:8092/backend" + element.content;
       element.content = element.content.substring(
         element.content.lastIndexOf("_") + 1
       );
     });
     lectures.value = data;
-    console.log(data);
+    console.log(lectures.value);
+  });
+
+  await courseServices.gets().then((response) => {
+    const data = response.data.data;
+
+    data.forEach((element) => {
+      element.category_id = element.category_id.id;
+    });
+
+    courses.value = data;
     
   });
 });
@@ -305,7 +310,7 @@ const formatDate = (date) => {
                     :key="course.id"
                     :value="course.id"
                   >
-                    {{ course.name }} ({{ course.id }})
+                    {{ course.title }} 
                   </option>
                 </select>
               </div>
