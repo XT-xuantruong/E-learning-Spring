@@ -10,4 +10,5 @@ public interface CourseEnrollmentService {
     public void createCourseEnrollment(CourseEnrollment theCourseEnrollment);
     public void updateCourseEnrollment(CourseEnrollment theCourseEnrollment);
     public void deleteById(String id);
+    public List<CourseEnrollment> findByUserAndCourse(String userId);
 }

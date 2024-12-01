@@ -42,4 +42,12 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService{
 		courseEnrollmentDAO.deleteById(id);
 	}
 
+	@Override
+	public List<CourseEnrollment> findByUserAndCourse(String userId) {
+
+		return courseEnrollmentDAO.findByUserAndCourse(userId);
+	}
+
+	
+
 }

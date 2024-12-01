@@ -85,6 +85,7 @@ import courses from "@/faker/course";
 import CourseList from "@/components/course/CourseList.vue";
 import courseServices from "@/services/courseServices";
 import categoryServices from "@/services/categoryServices";
+import courseEnrollmentServices from "@/services/courseEnrollmentServices";
 
 const route = useRoute();
 
@@ -112,6 +113,8 @@ const fetchCourse = async () => {
 //             console.error(error)
 //         })
 // }
+
+
 onBeforeMount(() => {
     fetchCourse()
     // fetchCategory()

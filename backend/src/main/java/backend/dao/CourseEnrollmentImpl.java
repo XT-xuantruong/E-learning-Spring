@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import backend.entity.CourseEnrollment;
+import jakarta.persistence.NoResultException;
 
 @Repository
 public class CourseEnrollmentImpl implements CourseEnrollmentDAO{
@@ -54,6 +55,25 @@ public class CourseEnrollmentImpl implements CourseEnrollmentDAO{
         CourseEnrollment theCourseEnrollment = currentSession.get(CourseEnrollment.class, id);
         currentSession.remove(theCourseEnrollment);
 		
+	}
+
+	@Override
+	@Transactional
+	public List<CourseEnrollment> findByUserAndCourse(String userId) {
+		Session currentSession = sessionFactory.getCurrentSession();
+
+	    Query<CourseEnrollment> theQuery = currentSession.createQuery(
+	        "SELECT ce FROM CourseEnrollment ce WHERE ce.user.id = :userId" ,
+	        CourseEnrollment.class
+	    );
+
+	    theQuery.setParameter("userId", userId);
+
+	    List<CourseEnrollment> result = theQuery.getResultList();
+	    if (result == null) {
+	        System.out.println("No course enrollment found for userId: " + userId);
+	    }
+	    return result;
 	}
 	
 }

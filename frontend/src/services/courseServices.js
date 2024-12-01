@@ -20,6 +20,16 @@ class CourseServices extends ApiService {
     };
     return this.request(option);
   }
+  async getMoreDetail(id) {
+    return this.request({
+      method: "get",
+      url: `/${this.entity}/get-more/${id}`,
+    });
+  }
+  // async update(data) {
+  //   // const adminStore = useAdminStore();
+  //   // console.log(adminStore.admin.isAuthenticated, adminStore.admin.access);
+  //   // console.log(data);
 
 
   async create(data) {
