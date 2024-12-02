@@ -156,18 +156,7 @@
               <span class="ml-3 text-sm font-medium">Question/Answer Management</span>
             </router-link>
 
-            <router-link
-              to="/admin/quiz/scope-management"
-              class="flex items-center px-4 py-2 rounded-lg transition-colors duration-200"
-              :class="[
-                $route.path === '/quiz/scope-management'
-                  ? 'bg-slate-700 text-emerald-400'
-                  : 'hover:bg-slate-700/50',
-              ]"
-            >
-              <i class="fas fa-tags w-5"></i>
-              <span class="ml-3 text-sm font-medium">Scope Management</span>
-            </router-link>
+           
           </div>
         </div>
 

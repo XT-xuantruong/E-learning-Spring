@@ -350,35 +350,7 @@ import quizServices from "@/services/quizServices";
 import questionServices from "@/services/questionServices";
 import answerServices from "@/services/answerServices";
 
-const quizzes = ref([
-  {
-    name: "Quiz Place",
-    questions: [
-      {
-        question: "What is the capital of France?",
-        answers: [
-          {
-            answer_text: "Pacific Ocean",
-            is_correct: false,
-          },
-          {
-            answer_text: "Pacific Ocean",
-            is_correct: false,
-          },
-          {
-            answer_text: "Indian Ocean",
-            is_correct: false,
-          },
-          {
-            answer_text: "Arctic Ocean",
-            is_correct: true,
-          },
-        ],
-      },
-    ],
-  },
-]);
-
+const quizzes = ref([]);
 const newQuestion = ref("");
 const questionID = ref("");
 const newAnswers = ref([{ answer_text: "", is_correct: false }]);
@@ -453,39 +425,66 @@ const findCorrectAnswer = (answers) => {
   return correctAnswer ? correctAnswer.answer_text : "";
 };
 
-const confirmImport = () => {
-  // Group questions by quiz
+const findQuiz = (name) => {
+  const quiz = quizzes.value.find((ele) => ele.name === name);
+  return quiz ? quiz.id : "";
+};
+
+const confirmImport = async () => {
   const quizGroups = {};
-  previewExcel.value.forEach((item) => {
-    if (!quizGroups[item.quiz]) {
-      quizGroups[item.quiz] = {
-        name: item.quiz,
-        questions: [],
-      };
-    }
 
-    quizGroups[item.quiz].questions.push({
-      question: item.question,
-      answers: item.answers,
-    });
-  });
+  await Promise.all(
+    previewExcel.value.map(async (item) => {
+      try {
+        const questionRes = await questionServices.create({
+          question_text: item.question,
+          quiz: findQuiz(item.quiz),
+        });
 
-  // Convert quizGroups object to array and merge with existing quizzes
+        const questionData = questionRes.data.data;
+
+        await Promise.all(
+          item.answers.map(async (answer) => {
+            await answerServices.create({
+              question: questionData.id,
+              answer_text: answer.answer_text,
+              is_correct: answer.is_correct,
+            });
+          })
+        );
+
+        if (!quizGroups[item.quiz]) {
+          quizGroups[item.quiz] = {
+            name: item.quiz,
+            questions: [],
+          };
+        }
+
+        quizGroups[item.quiz].questions.push({
+          question: item.question,
+          answers: item.answers,
+        });
+      } catch (error) {
+        console.error("Error processing item:", error);
+      }
+    })
+  );
+
+  console.log("Quiz Groups:", quizGroups);
+
   const importedQuizzes = Object.values(quizGroups);
+
   importedQuizzes.forEach((importedQuiz) => {
     const existingQuiz = quizzes.value.find(
       (q) => q.name === importedQuiz.name
     );
+
     if (existingQuiz) {
-      // Merge questions into existing quiz
       existingQuiz.questions.push(...importedQuiz.questions);
     } else {
-      // Add new quiz
-
       quizzes.value.push(importedQuiz);
     }
   });
-  console.log("long");
 
   console.log(quizzes);
   cancelImport();
@@ -499,7 +498,6 @@ const cancelImport = () => {
   }
 };
 
-// Question management functions
 const add = () => {
   clearNewQuestionForm();
   editingIndex.value = -1;
