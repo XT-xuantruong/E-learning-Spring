@@ -205,4 +205,5 @@ public class AuthController {
                 .body(new ApiResponse<>("error", e.getMessage(), null));
         }
     }
+
 }
