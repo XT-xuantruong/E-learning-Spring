@@ -20,6 +20,7 @@ export const useAdminStore = defineStore("admin", {
       access: null,
       refresh: null,
       avatar: null,
+      role: null,
     },
   }),
 
@@ -68,6 +69,7 @@ export const useAdminStore = defineStore("admin", {
       this.admin.name = null;
       this.admin.email = null;
       this.admin.avatar = null;
+      this.admin.role = null;
 
       localStorage.setItem("admin.isAuthenticated", false);
       localStorage.setItem("admin.access", "");
@@ -76,6 +78,7 @@ export const useAdminStore = defineStore("admin", {
       localStorage.setItem("admin.name", "");
       localStorage.setItem("admin.email", "");
       localStorage.setItem("admin.avatar", "");
+      localStorage.setItem("admin.role", "");
     },
 
     setAdminInfo(admin) {
@@ -84,11 +87,15 @@ export const useAdminStore = defineStore("admin", {
       this.admin.id = admin.id;
       this.admin.name = admin.name;
       this.admin.email = admin.email;
+      this.admin.role = admin.role;
+
       // this.admin.avatar = admin.avatar;
 
       localStorage.setItem("admin.id", this.admin.id);
       localStorage.setItem("admin.name", this.admin.name);
       localStorage.setItem("admin.email", this.admin.email);
+      localStorage.setItem("admin.role", this.admin.role);
+
       // localStorage.setItem("admin.avatar", this.admin.avatar);
 
       console.log("admin", this.admin);

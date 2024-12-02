@@ -15,7 +15,7 @@ export const adminRoutes = [
   {
     path: "/admin",
     name: "admin",
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: false },
     children: [
       {
         path: "login",
@@ -26,12 +26,10 @@ export const adminRoutes = [
         },
       },
       {
-        path: "",
+        path: "/",
         name: "dashboard",
-        component: DashboardView,
-        meta: {
-          title: "dashboard",
-        },
+        component: CourseManagement,
+
       },
       {
         path: "courses/course-management",

@@ -34,21 +34,25 @@ export const publicRoutes = [
   {
     path: "/study",
     name: "study",
+    meta: { requiresAuth: true },
     component: StudyView,
   },
   {
     path: "/quiz",
     name: "quiz",
+    meta: { requiresAuth: true },
     component: QuizView,
   },
   {
     path: "/myaccount",
     name: "myaccount",
+    meta: { requiresAuth: true },
     component: MyAccountView,
   },
   {
     path: "/checkout",
     name: "checkout",
+    meta: { requiresAuth: true },
     component: CheckoutView,
   },
   {

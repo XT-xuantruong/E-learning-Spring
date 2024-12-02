@@ -321,8 +321,9 @@ const handleSubmit = async () => {
           access_token: data.access_token,
           refresh_token: data.refresh_token,
         });
+        
         adminStore.setAdminInfo(data.user);
-        router.push("/admin");
+        router.push("/admin/courses/course-management");
       });
   } catch (error) {
     console.error("Login error:", error);
