@@ -33,9 +33,9 @@ public class CourseEnrollment {
     @Temporal(TemporalType.TIMESTAMP)
     private Date enrollAt;
     
-    @Column(name = "price")
-	private Float price;
-
+    @Column(name = "price") 
+    private Float price;
+    
     @Column(name = "is_paid", nullable = false)
     private boolean isPaid;
     

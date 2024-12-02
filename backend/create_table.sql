@@ -45,6 +45,14 @@ ALTER TABLE course
 ADD COLUMN price FLOAT NOT NULL DEFAULT 0.0;
 ALTER TABLE course_enrollment 
 ADD COLUMN price FLOAT NOT NULL DEFAULT 0.0;
+-- Add user_id column
+ALTER TABLE quiz_result 
+ADD COLUMN user_id VARCHAR(36) NOT NULL;
+
+-- Add foreign key constraint
+ALTER TABLE quiz_result
+ADD CONSTRAINT fk_quiz_result_user
+FOREIGN KEY (user_id) REFERENCES users(id);
 select * from category where slug = "react-js"; 
 ALTER TABLE course_enrollment 
 ADD CONSTRAINT unique_user_course UNIQUE (user_id, course_id);
