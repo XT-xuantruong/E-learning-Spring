@@ -25,12 +25,7 @@ export const adminRoutes = [
           title: "Login",
         },
       },
-      {
-        path: "/",
-        name: "dashboard",
-        component: CourseManagement,
-
-      },
+     
       {
         path: "courses/course-management",
         name: "CourseManagement",
