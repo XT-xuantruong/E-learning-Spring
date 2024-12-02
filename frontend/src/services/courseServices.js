@@ -31,7 +31,6 @@ class CourseServices extends ApiService {
   //   // console.log(adminStore.admin.isAuthenticated, adminStore.admin.access);
   //   // console.log(data);
 
-
   async create(data) {
     const adminStore = useAdminStore();
     data.createBy = adminStore.admin.id;
