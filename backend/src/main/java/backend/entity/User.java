@@ -1,6 +1,7 @@
 package backend.entity;
 
 import java.nio.charset.StandardCharsets;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,28 +9,14 @@ import java.util.UUID;
 
 import com.google.common.hash.Hashing;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
 
 
 @Entity
 @Table(name = "users")
 public class User {
 	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
-	private UUID id;
+	private String id;
 	
 	@Column(name = "first_name")
 	private String firstName;
@@ -40,7 +27,7 @@ public class User {
 	@Column(name = "avatar")    
 	private String avatar;
 	
-	@Enumerated(EnumType.STRING)
+	@Enumerated(EnumType.STRING) 
 	private Role role;
 	    
 	@Column(name = "email",unique = true)
@@ -57,19 +44,19 @@ public class User {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date updatedAt;
 	
-	@OneToMany(mappedBy = "create_by", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
+	@OneToMany(mappedBy = "Create_by", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Course> courses = new ArrayList<>();
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<CourseEnrollment> courseEnrollments = new ArrayList<>();
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
-
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Notification> notifications = new ArrayList<>();
+	private List<QuizResult> quizResults = new ArrayList<>();
 	
-	public User(UUID id, String firstName, String lastName, String avatar, Role role, String email, String password,
+	public User(String id, String firstName, String lastName, String avatar, Role role, String email, String password,
 			Date createdAt, Date updatedAt) {
 		super();
 		this.id = id;
@@ -86,22 +73,6 @@ public class User {
 	public User() {
 		super();
 	}
-	
-	public List<Notification> getNotifications() {
-		return notifications;
-	}
-
-	public void setNotifications(List<Notification> notifications) {
-		this.notifications = notifications;
-	}
-
-	public List<Comment> getComments() {
-		return comments;
-	}
-
-	public void setComments(List<Comment> comments) {
-		this.comments = comments;
-	}
 
 	public List<CourseEnrollment> getCourseEnrollments() {
 		return courseEnrollments;
@@ -115,15 +86,24 @@ public class User {
 		return courses;
 	}
 
+	
 	public void setCourses(List<Course> courses) {
 		this.courses = courses;
 	}
 
-	public UUID getId() {
+	public List<QuizResult> getQuizResults() {
+		return quizResults;
+	}
+
+	public void setQuizResults(List<QuizResult> quizResults) {
+		this.quizResults = quizResults;
+	}
+
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -179,7 +159,10 @@ public class User {
 
 	@PrePersist
 	protected void onCreate() {
-	  createdAt =updatedAt = new Date();
+		if (id == null || id.isEmpty()) {
+            id = UUID.randomUUID().toString();
+        }
+        createdAt = new Date();
 	}
 
     @PreUpdate

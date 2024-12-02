@@ -54,7 +54,7 @@
             >
               <option value="">Chọn khóa học</option>
               <option v-for="course in courses" :key="course.id" :value="course.id">
-                {{ course.name }}
+                {{ course.title }}
               </option>
             </select>
           </div>

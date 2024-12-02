@@ -16,7 +16,7 @@
 
                                     <div v-if="sortedCourses.length !== 0" class="col"
                                         v-for="(item, index) in sortedCourses" :key="index">
-                                        <CourseCard :course="item" />
+                                        <CourseCard :check="handlecheckSignup(item)" :course="item" />
                                     </div>
                                     <h3 v-else>No Course</h3>
                                 </div>
@@ -31,9 +31,11 @@
 </template>
 
 <script setup>
-import { defineProps, computed } from "vue";
+import { defineProps, computed, ref, onBeforeMount, onMounted } from "vue";
 import CourseCard from "./CourseCard.vue";
-
+import courseEnrollmentServices from "@/services/courseEnrollmentServices";
+import { useUserStore } from "@/stores/user";
+const user = useUserStore()
 const props = defineProps({
     title: {
         type: String,
@@ -84,4 +86,24 @@ const sortedCourses = computed(() => {
 
     return filteredCourses;
 });
+const coursebyuser = ref([])
+console.log(user.user.id);
+
+const fetchCourseByUser = async () => {
+    await courseEnrollmentServices.getbyuser({ userId: user.user.id })
+        .then(response => {
+            coursebyuser.value = response.data.data
+            console.log(response.data.data);
+
+        })
+        .catch(error => {
+            console.error(error)
+        })
+}
+onMounted(() => {
+    fetchCourseByUser()
+})
+const handlecheckSignup = (item) => {
+    return coursebyuser.value.some((i) => i.course.id === item.id);
+};
 </script>

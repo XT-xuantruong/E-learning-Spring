@@ -5,9 +5,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,33 +26,31 @@ import jakarta.persistence.TemporalType;
 @Table(name = "quiz")
 public class Quiz {
 	@Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+	private String id;
 
     @Column(name = "title", nullable = false)
     private String title;
 
     @ManyToOne
-    @JoinColumn(name = "course_id", nullable = false)
+    @JoinColumn(name = "course_id", nullable = true)
     private Course course;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
     
-    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(mappedBy = "quiz",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuizResult> quizResults = new ArrayList<>();
     
     
-	@PrePersist
-    protected void onCreate() {
-        createdAt = new Date();
-    }
+	
 
-	public Quiz(UUID id, String title, Course course, Date createdAt) {
+	public Quiz(String id, String title, Course course, Date createdAt) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -76,11 +77,11 @@ public class Quiz {
 		this.quizResults = quizResults;
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -106,6 +107,14 @@ public class Quiz {
 
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
+	}
+	
+	@PrePersist
+	protected void onCreate() {
+		if (id == null || id.isEmpty()) {
+            id = UUID.randomUUID().toString();
+        }
+        createdAt = new Date();
 	}
     
     

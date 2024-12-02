@@ -4,8 +4,10 @@ import { useRoute, useRouter } from "vue-router";
 import SidebarLayout from '@/layouts/user/SidebarLayout.vue';
 import Pagination from '@/components/pagination/Pagination.vue';
 import CourseList from '@/components/course/CourseList.vue';
-import courses from '@/faker/course';
+import { onBeforeMount } from "vue";
+import courseServices from "@/services/courseServices";
 
+const courseList = ref([])
 const route = useRoute();
 const router = useRouter();
 const sortOrder = ref("");
@@ -23,11 +25,33 @@ const filterOptions = ref({
 function closeModal() {
     openFilterModal.value = false;
 }
+const fetchCourse = async () => {
+    await courseServices.gets()
+        .then(response => {
+            courseList.value = response.data.data
+        })
+        .catch(error => {
+            console.error(error)
+        })
+}
+// const fetchCategory = async () => {
+//     await categoryServices.getByslug(route.query.c)
+//         .then(response => {
+//             cate.value = response.data.data
+//         })
+//         .catch(error => {
+//             console.error(error)
+//         })
+// }
+onBeforeMount(() => {
+    fetchCourse()
+    // fetchCategory()
+})
 
 let searchResult = computed(() => {
     if (!route.query.q) return courses;
     const query = route.query.q.toLowerCase();
-    return courses.filter((course) =>
+    return courseList.value.filter((course) =>
         course.title.toLowerCase().includes(query)
     );
 });

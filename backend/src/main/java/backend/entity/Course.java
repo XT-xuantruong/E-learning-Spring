@@ -5,32 +5,24 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "course")
 public class Course {
 	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
-	private UUID id;
+	private String id;
 	
 	@Column(name = "title")
 	private String Title;
 	
 	@Column(name = "description")
 	private String Description;
+	
+	@Column(name = "price")
+	private Float price;
 	
 	@Column(name = "thumbnail")
 	private String Thumbnail;
@@ -48,48 +40,58 @@ public class Course {
 	private Date createdAt;
 	
 	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<CourseEnrollment> courseEnrollments = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "course",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<Quiz> quizzes = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<QuizResult> quizResults = new ArrayList<>();
-	
-	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "course",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<Lecture> lectures = new ArrayList<>();
-	
-	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Comment> comments = new ArrayList<>();
-	
+		
 	@PrePersist
 	protected void onCreate() {
-	  createdAt = new Date();
+		if (id == null || id.isEmpty()) {
+            id = UUID.randomUUID().toString();
+        }
+        createdAt = new Date();
 	}
 
-	public Course(UUID id, String title, String description, String thumbnail, Category category_id, User create_by,
-			Date createdAt) {
-		super();
-		this.id = id;
-		Title = title;
-		Description = description;
-		Thumbnail = thumbnail;
-		Category_id = category_id;
-		Create_by = create_by;
-		this.createdAt = createdAt;
-	}
+	
 
 	public Course() {
 		super();
 	}
-	
-	public List<Comment> getComments() {
-		return comments;
+
+
+
+	public Course(String id, String title, String description, Float price, String thumbnail, Category category_id,
+			User create_by) {
+		super();
+		this.id = id;
+		Title = title;
+		Description = description;
+		this.price = price;
+		Thumbnail = thumbnail;
+		Category_id = category_id;
+		Create_by = create_by;
 	}
 
-	public void setComments(List<Comment> comments) {
-		this.comments = comments;
+
+
+	public Float getPrice() {
+		return price;
 	}
+
+
+
+	public void setPrice(Float price) {
+		this.price = price;
+	}
+
+
 
 	public List<Lecture> getLectures() {
 		return lectures;
@@ -99,13 +101,6 @@ public class Course {
 		this.lectures = lectures;
 	}
 
-	public List<QuizResult> getQuizResults() {
-		return quizResults;
-	}
-
-	public void setQuizResults(List<QuizResult> quizResults) {
-		this.quizResults = quizResults;
-	}
 
 	public List<Quiz> getQuizzes() {
 		return quizzes;
@@ -123,11 +118,11 @@ public class Course {
 		this.courseEnrollments = courseEnrollments;
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

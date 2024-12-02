@@ -1,44 +1,13 @@
 <script setup>
-import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
+import lectureServices from "@/services/lectureServices";
+import courseServices from "@/services/courseServices";
 
 // Add courses data
-const courses = ref([
-  { id: "VUE101", name: "Vue.js Fundamentals" },
-  { id: "VUE102", name: "Advanced Vue.js" },
-  { id: "VUE103", name: "Vue.js State Management" },
-  { id: "VUE104", name: "Vue.js Testing" },
-]);
+const courses = ref([]);
 
-const lectures = ref([
-  {
-    id: 1,
-    title: "Introduction to Vue 3",
-    course_id: "VUE101",
-    content: "lecture1.pdf",
-    pdfUrl: "https://example.com/sample1.pdf",
-    date: "2024-03-15",
-    size: "2.4 MB",
-  },
-  {
-    id: 2,
-    title: "Composition API Basics",
-    course_id: "VUE101",
-    content: "lecture2.pdf",
-    pdfUrl: "https://example.com/sample2.pdf",
-    date: "2024-03-16",
-    size: "1.8 MB",
-  },
-  {
-    id: 3,
-    title: "Reactivity in Depth",
-    course_id: "VUE102",
-    content: "lecture3.pdf",
-    pdfUrl: "https://example.com/sample3.pdf",
-    date: "2024-03-17",
-    size: "3.2 MB",
-  },
-]);
+const lectures = ref([]);
 
 const isModalOpen = ref(false);
 const isPdfViewerOpen = ref(false);
@@ -56,10 +25,18 @@ const formData = ref({
   size: "",
 });
 
+// Function to generate a unique ID
+const generateUniqueId = () => {
+  return lectures.value.length > 0
+    ? Math.max(...lectures.value.map((l) => l.id)) + 1
+    : 1;
+};
+
 const handleFileSelect = (event) => {
   const file = event.target.files[0];
   if (file && file.type === "application/pdf") {
     selectedFile.value = file;
+    formData.value.file = file;
     formData.value.content = file.name;
     formData.value.pdfUrl = URL.createObjectURL(file);
     formData.value.size = (file.size / (1024 * 1024)).toFixed(2) + " MB";
@@ -80,7 +57,12 @@ const closePdfViewer = () => {
   isPdfViewerOpen.value = false;
 };
 
-const updateLecture = () => {
+
+const updateLecture = async () => {
+  await lectureServices.update(formData.value).then((Response) => {
+    console.log(Response);
+  });
+
   const index = lectures.value.findIndex(
     (l) => l.id === selectedLecture.value.id
   );
@@ -93,8 +75,34 @@ const updateLecture = () => {
   closeModal();
 };
 
-const deleteLecture = (lectureId) => {
+const addLecture = async () => {
+  if (
+    !formData.value.title ||
+    !formData.value.course_id ||
+    !selectedFile.value
+  ) {
+    alert("Please fill in all required fields and select a PDF file");
+    return;
+  }
+
+  await lectureServices.create(formData.value).then((Response) => {
+    console.log(Response);
+  });
+  const newLecture = {
+    id: generateUniqueId(),
+    ...formData.value,
+  };
+
+  lectures.value.push(newLecture);
+
+  closeModal();
+};
+
+const deleteLecture = async (lectureId) => {
   if (confirm("Are you sure you want to delete this lecture?")) {
+    await lectureServices.delete(lectureId).then((response) => {
+      console.log(response);
+    });
     lectures.value = lectures.value.filter((l) => l.id !== lectureId);
   }
 };
@@ -107,6 +115,11 @@ const openEditModal = (lecture) => {
   isModalOpen.value = true;
 };
 
+const openAddModal = () => {
+  modalMode.value = "add";
+  isModalOpen.value = true;
+};
+
 const closeModal = () => {
   isModalOpen.value = false;
   selectedLecture.value = null;
@@ -116,19 +129,61 @@ const closeModal = () => {
     content: "",
     pdfUrl: "",
     date: "",
-    size: "",
   };
   selectedFile.value = null;
 };
 
-const handleSubmit = () => {
-  updateLecture();
+const handleSubmit = async () => {
+  if (modalMode.value === "add") {
+    await addLecture();
+  } else {
+    updateLecture();
+  }
 };
 
-// Add getter for course name
 const getCourseName = (courseId) => {
   const course = courses.value.find((c) => c.id === courseId);
-  return course ? course.name : courseId;
+  return course ? course.title : courseId;
+};
+
+onBeforeMount(async () => {
+  // await courseServices.gets().then((res)=>{
+  //   console.log(res.data);
+    
+  // })
+  await courseServices.gets().then((response) => {
+    const data = response.data.data;
+
+    data.forEach((element) => {
+      element.category_id = element.category_id.id;
+    });
+
+    courses.value = data;
+    
+  });
+  await lectureServices.gets().then((response) => {
+    const data = response.data.data;
+    data.forEach((element) => {
+      element.course_id = element.course.id;
+      element.date = element.createdAt;
+      element.pdfUrl = "http://localhost:8092/backend" + element.content;
+      element.content = element.content.substring(
+        element.content.lastIndexOf("_") + 1
+      );
+    });
+    lectures.value = data;
+    console.log(lectures.value);
+  });
+
+ 
+});
+
+const formatDate = (date) => {
+  return new Date(date).toLocaleDateString("vi-VN", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 };
 </script>
 
@@ -146,6 +201,13 @@ const getCourseName = (courseId) => {
               Manage your course lectures and materials
             </p>
           </div>
+          <!-- Add New Lecture Button -->
+          <button
+            @click="openAddModal"
+            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-200"
+          >
+            Add New Lecture
+          </button>
         </div>
 
         <!-- Content Section -->
@@ -157,7 +219,6 @@ const getCourseName = (courseId) => {
               <div class="col-span-4 px-6 py-3">Lecture Details</div>
               <div class="col-span-2 px-6 py-3">Course</div>
               <div class="col-span-2 px-6 py-3">Date</div>
-              <div class="col-span-2 px-6 py-3">Size</div>
               <div class="col-span-2 px-6 py-3">Actions</div>
             </div>
 
@@ -190,25 +251,21 @@ const getCourseName = (courseId) => {
                 <div
                   class="col-span-2 px-6 py-4 flex items-center text-sm text-gray-500"
                 >
-                  {{ lecture.date }}
+                  {{ formatDate(lecture.date) }}
                 </div>
-                <div
-                  class="col-span-2 px-6 py-4 flex items-center text-sm text-gray-500"
-                >
-                  {{ lecture.size }}
-                </div>
+
                 <div class="col-span-2 px-6 py-4 flex items-center space-x-3">
                   <button
                     @click="openEditModal(lecture)"
-                    class=" text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md hover:bg-indigo-100 transition-colors duration-200"
+                    class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md hover:bg-indigo-100 transition-colors duration-200"
                   >
-                  <font-awesome-icon :icon="['fas', 'pen']" />
+                    <font-awesome-icon :icon="['fas', 'pen']" />
                   </button>
                   <button
                     @click="deleteLecture(lecture.id)"
                     class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md hover:bg-red-100 transition-colors duration-200"
                   >
-                  <font-awesome-icon :icon="['fas', 'trash']" />
+                    <font-awesome-icon :icon="['fas', 'trash']" />
                   </button>
                 </div>
               </div>
@@ -258,7 +315,7 @@ const getCourseName = (courseId) => {
                     :key="course.id"
                     :value="course.id"
                   >
-                    {{ course.name }} ({{ course.id }})
+                    {{ course.title }} 
                   </option>
                 </select>
               </div>
@@ -320,19 +377,22 @@ const getCourseName = (courseId) => {
               class="w-full h-full rounded-lg shadow-inner"
               type="application/pdf"
             >
-              <div class="flex items-center justify-center h-full">
-                <p class="text-gray-500 text-center">
-                  Your browser doesn't support PDF viewing.<br />
-                  <a
-                    :href="currentPdfUrl"
-                    target="_blank"
-                    class="text-indigo-600 hover:text-indigo-800"
-                  >
-                    Download the PDF
-                  </a>
-                </p>
-              </div>
             </iframe>
+            <div
+              v-if="!currentPdfUrl"
+              class="flex items-center justify-center h-full"
+            >
+              <p class="text-gray-500 text-center">
+                Your browser doesn't support PDF viewing.<br />
+                <a
+                  :href="currentPdfUrl"
+                  target="_blank"
+                  class="text-indigo-600 hover:text-indigo-800"
+                >
+                  Download the PDF
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       </div>

@@ -3,6 +3,8 @@ package backend.entity;
 import java.util.Date;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -18,24 +21,23 @@ import jakarta.persistence.TemporalType;
 @Table(name = "lecture")
 public class Lecture {
 	@Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+	private String id;
 
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "content", nullable = false)
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "course_id", nullable = false)
+    @JoinColumn(name = "course_id", nullable = true)
     private Course course;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-	public Lecture(UUID id, String title, String content, Course course, Date createdAt) {
+	public Lecture(String id, String title, String content, Course course, Date createdAt) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -48,11 +50,11 @@ public class Lecture {
 		super();
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -88,5 +90,12 @@ public class Lecture {
 		this.createdAt = createdAt;
 	}
     
+	@PrePersist
+	protected void onCreate() {
+		if (id == null || id.isEmpty()) {
+            id = UUID.randomUUID().toString();
+        }
+        createdAt = new Date();
+	}
     
 }

@@ -15,20 +15,6 @@
     <!-- Navigation Menu -->
     <nav class="mt-6 px-4">
       <div class="space-y-3">
-        <!-- Dashboard -->
-        <router-link
-          to="/admin/"
-          class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200"
-          :class="[
-            $route.path === 'admin/dashboard'
-              ? 'bg-slate-700 text-emerald-400'
-              : 'hover:bg-slate-700/50',
-          ]"
-        >
-          <i class="fas fa-tachometer-alt w-5"></i>
-          <span class="ml-3 text-sm font-medium">Dashboard</span>
-        </router-link>
-
         <!-- Courses with Submenu -->
         <div class="space-y-2">
           <button
@@ -83,7 +69,9 @@
               ]"
             >
               <i class="fas fa-tags w-5"></i>
-              <span class="ml-3 text-sm font-medium">Category Course Management</span>
+              <span class="ml-3 text-sm font-medium"
+                >Category Course Management</span
+              >
             </router-link>
             <router-link
               to="/admin/courses/lecture-management"
@@ -153,46 +141,22 @@
               ]"
             >
               <i class="fas fa-tags w-5"></i>
-              <span class="ml-3 text-sm font-medium">Question/Answer Management</span>
-            </router-link>
-
-            <router-link
-              to="/admin/quiz/scope-management"
-              class="flex items-center px-4 py-2 rounded-lg transition-colors duration-200"
-              :class="[
-                $route.path === '/quiz/scope-management'
-                  ? 'bg-slate-700 text-emerald-400'
-                  : 'hover:bg-slate-700/50',
-              ]"
-            >
-              <i class="fas fa-tags w-5"></i>
-              <span class="ml-3 text-sm font-medium">Scope Management</span>
+              <span class="ml-3 text-sm font-medium"
+                >Question/Answer Management</span
+              >
             </router-link>
           </div>
         </div>
 
-        <!-- Review -->
-        <router-link
-          to="/admin/review"
-          class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200"
-          :class="[
-            $route.path === '/review'
-              ? 'bg-slate-700 text-emerald-400'
-              : 'hover:bg-slate-700/50',
-          ]"
-        >
-          <i class="fas fa-shopping-cart w-5"></i>
-          <span class="ml-3 text-sm font-medium">Review Management</span>
-        </router-link>
-
         <!-- User -->
-        <div class="space-y-2">
+        <div
+        v-if="adminStore.admin.role === 'ADMIN'"
+        class="space-y-2">
           <button
             @click="toggleSubmenu('users')"
             class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors duration-200"
             :class="[
-              openedSubmenus.includes('users') ||
-              $route.path.includes('/users')
+              openedSubmenus.includes('users') || $route.path.includes('/users')
                 ? 'bg-slate-700 text-emerald-400'
                 : 'hover:bg-slate-700/50',
             ]"
@@ -212,8 +176,7 @@
           <!-- Submenu -->
           <div
             v-show="
-              openedSubmenus.includes('users') ||
-              $route.path.includes('/users')
+              openedSubmenus.includes('users') || $route.path.includes('/users')
             "
             class="pl-4 space-y-2"
           >
@@ -267,6 +230,10 @@
 <script setup>
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import { useAdminStore } from "@/stores/admin";
+
+const adminStore = useAdminStore();
+
 const route = useRoute();
 const openedSubmenus = ref([]);
 

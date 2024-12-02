@@ -4,18 +4,18 @@ import CourseManagement from "@/views/CourseManagementView.vue";
 import CategoryCourse from "@/views/CategoryCourseView.vue";
 import QuizList from "@/views/QuizListView.vue";
 import QAManagement from "@/views/QAManagementView.vue";
-import ReviewManagement from "@/views/ReviewManagementView.vue";
 import ScopeManagement from "@/views/ScopeManagementView.vue";
 import LectureManagement from "@/views/LectureManagementView.vue";
 import StudentManagement from "@/views/StudentManagementView.vue";
 import TeacherManagement from "@/views/TeacherManagementView.vue";
 import Login from "@/views/LoginView.vue";
+import DashboardView from "@/views/DashboardView.vue";
 
 export const adminRoutes = [
   {
     path: "/admin",
     name: "admin",
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: false },
     children: [
       {
         path: "login",
@@ -25,14 +25,7 @@ export const adminRoutes = [
           title: "Login",
         },
       },
-      {
-        path: "",
-        name: "dashboard",
-        component: Dashboard,
-        meta: {
-          title: "dashboard",
-        },
-      },
+     
       {
         path: "courses/course-management",
         name: "CourseManagement",
@@ -81,14 +74,7 @@ export const adminRoutes = [
           title: "QAManagement",
         },
       },
-      {
-        path: "review",
-        name: "ReviewManagement",
-        component: ReviewManagement,
-        meta: {
-          title: "ReviewManagement",
-        },
-      },
+     
       {
         path: "users/student-management",
         name: "StudentManagement",

@@ -5,12 +5,52 @@ import CourseCard from '@/components/course/CourseCard.vue';
 import DefaultLayout from '@/layouts/user/DefaultLayout.vue';
 import Slider from '@/components/slider/Slider.vue';
 import CategorySection from '@/components/category/CategorySection.vue';
-import courses from '@/faker/course';
+import categoryServices from '@/services/categoryServices';
+import courseServices from '@/services/courseServices';
+import courseEnrollmentServices from '@/services/courseEnrollmentServices';
+import { useUserStore } from '@/stores/user';
 
+const categories = ref([])
+const courseList = ref([])
+const coursebyuser = ref([])
+const user = useUserStore()
+const fetchCourseByUser = async () => {
+  await courseEnrollmentServices.getbyuser({ userId: user.user.id })
+    .then(response => {
+      coursebyuser.value = response.data.data
+      console.log(response.data.data);
 
-// Products data
-
-
+    })
+    .catch(error => {
+      console.error(error)
+    })
+}
+const handlecheckSignup = (item) => {
+  return coursebyuser.value.some((i) => i.course.id === item.id);
+};
+const fetchCourse = async () => {
+  await courseServices.gets()
+    .then(response => {
+      courseList.value = response.data.data
+    })
+    .catch(error => {
+      console.error(error)
+    })
+}
+const fetchCategory = async () => {
+  await categoryServices.gets()
+    .then(response => {
+      categories.value = response.data.data
+    })
+    .catch(error => {
+      console.error(error)
+    })
+}
+onBeforeMount(() => {
+  fetchCourse()
+  fetchCategory()
+  fetchCourseByUser()
+})
 // Instructors data
 const instructors = ref([
   {
@@ -35,67 +75,6 @@ const instructors = ref([
     description: 'Phát triển hệ thống cho các tập đoàn lớn'
   }
 ])
-
-// Reviews data
-const reviews = ref([
-  {
-    id: 1,
-    name: 'Nguyễn Văn X',
-    avatar: '/api/placeholder/100/100',
-    comment: 'Khóa học rất hay và chi tiết, giảng viên nhiệt tình',
-    rating: 5
-  },
-  {
-    id: 2,
-    name: 'Trần Thị Y',
-    avatar: '/api/placeholder/100/100',
-    comment: 'Tài liệu đầy đủ, dễ hiểu, support nhanh chóng',
-    rating: 5
-  },
-  {
-    id: 3,
-    name: 'Phạm Văn Z',
-    avatar: '/api/placeholder/100/100',
-    comment: 'Học xong đã có thể áp dụng vào công việc thực tế',
-    rating: 4
-  }
-])
-
-
-// // Previous data remains the same
-// const slides = ref([/* ... previous slides data ... */])
-// const courses = ref([/* ... previous courses data ... */])
-// const instructors = ref([/* ... previous instructors data ... */])
-// const reviews = ref([/* ... previous reviews data ... */])
-
-// Stats data
-const stats = ref([
-  {
-    icon: Book,
-    count: '1000+',
-    label: 'Khóa học',
-    color: 'text-blue-600'
-  },
-  {
-    icon: Users,
-    count: '50,000+',
-    label: 'Học viên',
-    color: 'text-green-600'
-  },
-  {
-    icon: Video,
-    count: '5,000+',
-    label: 'Video bài giảng',
-    color: 'text-yellow-600'
-  },
-  {
-    icon: Award,
-    count: '200+',
-    label: 'Giảng viên',
-    color: 'text-purple-600'
-  }
-])
-
 // FAQs data
 const faqs = ref([
   {
@@ -120,36 +99,12 @@ const faqs = ref([
   }
 ])
 
-// Login/Signup modal controls
-const showLoginModal = ref(false)
-const showSignupModal = ref(false)
-const loginForm = ref({
-  email: '',
-  password: ''
-})
-const signupForm = ref({
-  name: '',
-  email: '',
-  password: '',
-  confirmPassword: ''
-})
-
-// Newsletter form
-const newsletterEmail = ref('')
-
-const handleNewsletterSubmit = () => {
-  // Handle newsletter signup logic
-  alert('Cảm ơn bạn đã đăng ký nhận tin!')
-  newsletterEmail.value = ''
-}
-
-// Previous methods remain the same
 </script>
 
 <template>
   <DefaultLayout>
     <Slider />
-    <CategorySection />
+    <CategorySection :categories="categories" />
     <!-- Courses Grid -->
     <section class="py-16 container mx-auto px-4">
       <div class="flex justify-between items-center mb-12">
@@ -160,43 +115,9 @@ const handleNewsletterSubmit = () => {
         </a>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <CourseCard v-for="course in courses" :key="course.id" :course="course" />
+        <CourseCard :check="handlecheckSignup(course)" v-for="course in courseList" :key="course.id" :course="course" />
       </div>
     </section>
-    <!-- Instructors -->
-    <section class="py-16 bg-gray-100">
-      <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center mb-12">Đội ngũ giảng viên</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div v-for="instructor in instructors" :key="instructor.id" class="bg-white rounded-lg p-6 text-center">
-            <img :src="instructor.image" :alt="instructor.name"
-              class="w-32 h-32 rounded-full mx-auto mb-4 object-cover" />
-            <h3 class="text-xl font-semibold">{{ instructor.name }}</h3>
-            <p class="text-blue-600 mt-1">{{ instructor.role }}</p>
-            <p class="text-gray-600 mt-2">{{ instructor.description }}</p>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- Reviews -->
-    <section class="py-16 container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-center mb-12">Đánh giá từ học viên</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div v-for="review in reviews" :key="review.id" class="bg-white rounded-lg p-6 shadow">
-          <div class="flex items-center mb-4">
-            <img :src="review.avatar" :alt="review.name" class="w-12 h-12 rounded-full mr-4" />
-            <div>
-              <h4 class="font-semibold">{{ review.name }}</h4>
-              <div class="flex text-yellow-400">
-                <span v-for="star in review.rating" :key="star">⭐</span>
-              </div>
-            </div>
-          </div>
-          <p class="text-gray-600">{{ review.comment }}</p>
-        </div>
-      </div>
-    </section>
-
     <!-- FAQ Section -->
     <section class="py-16 bg-gray-50">
       <div class="container mx-auto px-4">

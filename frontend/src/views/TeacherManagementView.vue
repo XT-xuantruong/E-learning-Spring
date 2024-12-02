@@ -1,29 +1,14 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onBeforeMount } from "vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
+import oauthServices from "@/services/oauthServices";
+import { useAdminStore } from "@/stores/admin";
 
-const teachers = ref([
-  {
-    id: 1,
-    first_name: "John",
-    last_name: "Doe",
-    avatar: "/api/placeholder/100/100",
-    role: "teacher",
-    email: "john.doe@school.com",
-  },
-  {
-    id: 2,
-    first_name: "Jane",
-    last_name: "Smith",
-    avatar: "/api/placeholder/100/100",
-    role: "teacher",
-    email: "jane.smith@school.com",
-  },
-]);
-
+const user = useAdminStore();
+const teachers = ref([]);
 const formData = ref({
-  first_name: "",
-  last_name: "",
+  firstName: "",
+  lastName: "",
   avatar: "/api/placeholder/100/100",
   role: "teacher",
   email: "",
@@ -33,52 +18,128 @@ const isEditing = ref(false);
 const selectedTeacherId = ref(null);
 const showModal = ref(false);
 const searchQuery = ref("");
+const previewUrl = ref("http://localhost:8092/backend" + user.admin.avatar);
+
+// Fetch teachers on component mount
+const fetchTeachers = async () => {
+  try {
+    const response = await oauthServices.gets(user.accessToken, {
+      role: "TEACHER",
+    });
+    response.data.data.forEach((element) => {
+      element.avatar = "http://localhost:8092/backend" + element.avatar;
+    });
+    teachers.value =
+      response.data.data.filter((ele) => ele.role === "TEACHER") || [];
+  } catch (error) {
+    console.error("Error fetching teachers:", error);
+    alert("Không thể tải danh sách giáo viên");
+  }
+};
 
 const filteredTeachers = computed(() => {
   return teachers.value.filter(
     (teacher) =>
-      teacher.first_name
+      teacher.firstName
         .toLowerCase()
         .includes(searchQuery.value.toLowerCase()) ||
-      teacher.last_name
+      teacher.lastName
         .toLowerCase()
         .includes(searchQuery.value.toLowerCase()) ||
       teacher.email.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 });
 
-const updateTeacher = () => {
-  const index = teachers.value.findIndex(
-    (t) => t.id === selectedTeacherId.value
-  );
-  if (index !== -1) {
-    teachers.value[index] = {
-      id: selectedTeacherId.value,
-      ...formData.value,
-    };
+const handleFileSelect = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    if (file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewUrl.value = e.target.result;
+        formData.value.avatar = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert("Vui lòng chọn tệp hình ảnh");
+    }
   }
-  resetForm();
 };
 
-const deleteTeacher = (id) => {
+const updateTeacher = async () => {
+  try {
+    if (isEditing.value) {
+      console.log(formData.value);
+
+      // Update existing teacher
+      const response = await oauthServices.updateProfile(
+        selectedTeacherId.value,
+        {
+          ...formData.value,
+        }
+      );
+
+      // Update local state
+      const index = teachers.value.findIndex(
+        (t) => t.id === selectedTeacherId.value
+      );
+      if (index !== -1) {
+        teachers.value[index] = response.data.data;
+      }
+
+      alert("Cập nhật giáo viên thành công");
+    } else {
+      const signupData = {
+        ...formData.value,
+        password: "DefaultPassword123!",
+        confirmPassword: "DefaultPassword123!",
+        phone: "",
+      };
+
+      const response = await oauthServices.signup(signupData);
+      teachers.value.push(response.data.data);
+      alert("Thêm giáo viên thành công");
+    }
+
+    resetForm();
+  } catch (error) {
+    console.error("Error updating/creating teacher:", error);
+    alert(error.response?.data?.message || "Có lỗi xảy ra. Vui lòng thử lại.");
+  }
+};
+
+const deleteTeacher = async (id) => {
   if (confirm("Bạn có chắc muốn xóa giáo viên này?")) {
-    teachers.value = teachers.value.filter((t) => t.id !== id);
+    try {
+      await oauthServices.delete(id, user.accessToken);
+      teachers.value = teachers.value.filter((t) => t.id !== id);
+      alert("Xóa giáo viên thành công");
+    } catch (error) {
+      console.error("Error deleting teacher:", error);
+      alert(error.response?.data?.message || "Không thể xóa giáo viên");
+    }
   }
 };
 
 const editTeacher = (teacher) => {
   selectedTeacherId.value = teacher.id;
-  formData.value = { ...teacher };
+  formData.value = {
+    firstName: teacher.firstName,
+    lastName: teacher.lastName,
+    email: teacher.email,
+    avatar: teacher.avatar ,
+  };
+  previewUrl.value = teacher.avatar ;
   isEditing.value = true;
   showModal.value = true;
 };
 
 const resetForm = () => {
   formData.value = {
-    first_name: "",
-    last_name: "",
+    firstName: "",
+    lastName: "",
     avatar: "/api/placeholder/100/100",
-    role: "teacher",
+    role: "TEACHER",
     email: "",
   };
   isEditing.value = false;
@@ -86,21 +147,18 @@ const resetForm = () => {
   showModal.value = false;
 };
 
-const handleAvatarUpload = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    formData.value.avatar = "/api/placeholder/100/100";
-  }
-};
-
 const handleClickOutside = (event) => {
   if (event.target.classList.contains("modal-overlay")) {
     resetForm();
   }
 };
+
+// Fetch teachers when component is mounted
+onBeforeMount(fetchTeachers);
 </script>
 
 <template>
+  <!-- Template remains the same as previous version -->
   <DefaultLayout>
     <div class="min-h-screen bg-gray-50 p-6">
       <!-- Main Container -->
@@ -109,6 +167,7 @@ const handleClickOutside = (event) => {
         <div class="mb-8">
           <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold text-gray-900">Quản lý giáo viên</h1>
+            
           </div>
 
           <!-- Search and Filter Section -->
@@ -155,7 +214,7 @@ const handleClickOutside = (event) => {
                 />
                 <div class="flex-1 min-w-0">
                   <p class="text-lg font-semibold text-gray-900 truncate">
-                    {{ teacher.first_name }} {{ teacher.last_name }}
+                    {{ teacher.firstName }} {{ teacher.lastName }}
                   </p>
                   <p class="text-sm text-gray-500 truncate">
                     {{ teacher.email }}
@@ -209,7 +268,7 @@ const handleClickOutside = (event) => {
         </div>
       </div>
 
-      <!-- Modal -->
+      <!-- Modal (remains the same) -->
       <div
         v-if="showModal"
         class="modal-overlay fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50"
@@ -235,7 +294,7 @@ const handleClickOutside = (event) => {
                     >Họ</label
                   >
                   <input
-                    v-model="formData.first_name"
+                    v-model="formData.firstName"
                     type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                     required
@@ -246,7 +305,7 @@ const handleClickOutside = (event) => {
                     >Tên</label
                   >
                   <input
-                    v-model="formData.last_name"
+                    v-model="formData.lastName"
                     type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                     required
@@ -269,13 +328,13 @@ const handleClickOutside = (event) => {
                   >
                   <div class="flex items-center space-x-4">
                     <img
-                      :src="formData.avatar"
+                      :src="previewUrl"
                       alt="Preview"
                       class="h-12 w-12 rounded-full object-cover"
                     />
                     <input
                       type="file"
-                      @change="handleAvatarUpload"
+                      @change="handleFileSelect"
                       accept="image/*"
                       class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                     />

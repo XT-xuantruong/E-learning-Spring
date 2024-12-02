@@ -19,8 +19,7 @@ import jakarta.persistence.TemporalType;
 @Table(name = "course_enrollment")
 public class CourseEnrollment {
 	@Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -33,33 +32,61 @@ public class CourseEnrollment {
     @Column(name = "enroll_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date enrollAt;
-
-    @Column(name = "ispaid", nullable = false)
+    
+    @Column(name = "price") 
+    private Float price;
+    
+    @Column(name = "is_paid", nullable = false)
     private boolean isPaid;
+    
+    @Column(name = "is_finish", nullable = true)
+    private boolean isFinish;
+    
+    @Column(name = "last_lecture", nullable = true)
+    private String lastLecture;
+    
+    @Column(name = "last_quiz", nullable = true)
+    private String lastquiz;
 
     @PrePersist
-    protected void onEnroll() {
+    protected void onCreate() {
+        if (id == null || id.isEmpty()) {
+            id = UUID.randomUUID().toString();
+        }
         enrollAt = new Date();
     }
-
-	public CourseEnrollment(UUID id, User user, Course course, Date enrollAt, boolean isPaid) {
-		super();
-		this.id = id;
-		this.user = user;
-		this.course = course;
-		this.enrollAt = enrollAt;
-		this.isPaid = isPaid;
-	}
 
 	public CourseEnrollment() {
 		super();
 	}
 
-	public UUID getId() {
+	public CourseEnrollment(String id, User user, Course course, Date enrollAt, Float price, boolean isPaid,
+			boolean isFinish, String lastLecture, String lastquiz) {
+		super();
+		this.id = id;
+		this.user = user;
+		this.course = course;
+		this.enrollAt = enrollAt;
+		this.price = price;
+		this.isPaid = isPaid;
+		this.isFinish = isFinish;
+		this.lastLecture = lastLecture;
+		this.lastquiz = lastquiz;
+	}
+	
+	public Float getPrice() {
+		return price;
+	}
+
+	public void setPrice(Float price) {
+		this.price = price;
+	}
+
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -94,5 +121,36 @@ public class CourseEnrollment {
 	public void setPaid(boolean isPaid) {
 		this.isPaid = isPaid;
 	}
+
+
+	public boolean isFinish() {
+		return isFinish;
+	}
+
+
+	public void setFinish(boolean isFinish) {
+		this.isFinish = isFinish;
+	}
+
+
+	public String getLastLecture() {
+		return lastLecture;
+	}
+
+
+	public void setLastLecture(String lastLecture) {
+		this.lastLecture = lastLecture;
+	}
+
+
+	public String getLastquiz() {
+		return lastquiz;
+	}
+
+
+	public void setLastquiz(String lastquiz) {
+		this.lastquiz = lastquiz;
+	}
+	
     
 }

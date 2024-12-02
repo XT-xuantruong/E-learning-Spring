@@ -1,22 +1,21 @@
 package backend.entity;
 
+import java.util.Date;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "answer")
 public class Answer {
 	@Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
     @ManyToOne
     @JoinColumn(name = "question_id", nullable = false)
@@ -27,8 +26,15 @@ public class Answer {
 
     @Column(name = "is_correct", nullable = false)
     private boolean isCorrect;
+    
+    @PrePersist
+    protected void onCreate() {
+        if (id == null || id.isEmpty()) {
+            id = UUID.randomUUID().toString();
+        }
+    }
 
-	public Answer(UUID id, Question question, String answerText, boolean isCorrect) {
+	public Answer(String id, Question question, String answerText, boolean isCorrect) {
 		super();
 		this.id = id;
 		this.question = question;
@@ -40,11 +46,11 @@ public class Answer {
 		super();
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

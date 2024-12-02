@@ -15,7 +15,8 @@
             </div>
         </div>
 
-        <CourseList :sort="sortOrder" :filterOptions="filterOptions" :title="category.name" :courses="paginatedItems" />
+        <CourseList :sort="sortOrder" :filterOptions="filterOptions" :title="category?.title"
+            :courses="paginatedItems" />
         <Pagination :totalItems="totalItems" :itemsPerPage="itemsPerPage" @page-changed="handlePageChange"
             :currentPage="currentPage" />
         <!-- Filter Modal -->
@@ -74,7 +75,7 @@
     </SidebarLayout>
 </template>
 <script setup>
-import { ref, watch, computed } from "vue";
+import { ref, watch, computed, onBeforeMount } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import SidebarLayout from "@/layouts/user/SidebarLayout.vue";
 import CourseCard from "@/components/course/CourseCard.vue";
@@ -82,19 +83,51 @@ import Pagination from "@/components/pagination/Pagination.vue";
 import categories from "@/faker/categories";
 import courses from "@/faker/course";
 import CourseList from "@/components/course/CourseList.vue";
+import courseServices from "@/services/courseServices";
+import categoryServices from "@/services/categoryServices";
+import courseEnrollmentServices from "@/services/courseEnrollmentServices";
 
 const route = useRoute();
 
 const router = useRouter();
-const category = ref(
-    categories.find((r) => r.slug == route.query.c)
-);
 
-let productsByCategory = computed(() => {
-    // Ensure products is an array and category is defined
-    if (!courses || !category.value) return [];
-    return courses.filter((p) => p.category_id === category.value.id);
-});
+const cate = ref({})
+const courseList = ref([])
+const productsByCategory = ref([]);
+const fetchCourse = async () => {
+    await courseServices.gets()
+        .then(response => {
+            courseList.value = response.data.data
+            updateProductsByCategory();
+        })
+        .catch(error => {
+            console.error(error)
+        })
+}
+// const fetchCategory = async () => {
+//     await categoryServices.getByslug(route.query.c)
+//         .then(response => {
+//             cate.value = response.data.data
+//         })
+//         .catch(error => {
+//             console.error(error)
+//         })
+// }
+
+
+onBeforeMount(() => {
+    fetchCourse()
+    // fetchCategory()
+})
+const updateProductsByCategory = () => {
+    productsByCategory.value = courseList.value.filter(
+        (r) => r.category_id?.slug === route.query.c // Kiểm tra `category_id` tồn tại
+    );
+};
+console.log("course " + courseList.value);
+console.log("pro" + productsByCategory.value);
+
+
 const sortOrder = ref("");
 
 const openFilterModal = ref(false);

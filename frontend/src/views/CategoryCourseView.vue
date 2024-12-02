@@ -55,11 +55,10 @@
             <input
               type="text"
               v-model="searchQuery"
-              placeholder="Tìm kiếm danh mục..."
+              placeholder="Search..."
               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-      
         </div>
       </div>
 
@@ -76,52 +75,10 @@
           <div class="col-span-2 text-right">Thao tác</div>
         </div>
 
-        <!-- Empty State -->
-        <div v-if="filteredCategories.length === 0" class="py-12 text-center">
-          <svg
-            class="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-            />
-          </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">
-            Chưa có danh mục nào
-          </h3>
-          <p class="mt-1 text-sm text-gray-500">
-            Bắt đầu bằng việc tạo danh mục mới.
-          </p>
-          <div class="mt-6">
-            <button
-              @click="openModal()"
-              class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-            >
-              <svg
-                class="-ml-1 mr-2 h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Thêm danh mục mới
-            </button>
-          </div>
-        </div>
+ 
 
         <!-- Categories List -->
-        <div v-else>
+        <div>
           <div
             v-for="(category, index) in filteredCategories"
             :key="category.id"
@@ -135,7 +92,6 @@
               <div class="text-sm font-medium text-gray-900">
                 {{ category.title }}
               </div>
-              <div class="text-xs text-gray-500">ID: {{ category.id }}</div>
             </div>
             <div class="col-span-3">
               <span
@@ -153,14 +109,14 @@
                 class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md hover:bg-indigo-100 transition-colors duration-200"
                 title="Sửa"
               >
-              <font-awesome-icon :icon="['fas', 'pen']" />
+                <font-awesome-icon :icon="['fas', 'pen']" />
               </button>
               <button
                 @click="deleteCategory(category.id)"
                 class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md hover:bg-red-100 transition-colors duration-200"
                 title="Xóa"
               >
-              <font-awesome-icon :icon="['fas', 'trash']" />
+                <font-awesome-icon :icon="['fas', 'trash']" />
               </button>
             </div>
           </div>
@@ -225,7 +181,6 @@
                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 :class="{ 'border-red-300': formErrors.slug }"
                 placeholder="Nhập slug danh mục"
-                :disabled="isEditing"
                 required
               />
               <p class="mt-1 text-sm text-gray-500">
@@ -280,24 +235,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from "vue";
+import { ref, reactive, computed, watch, onBeforeMount } from "vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
+import categoryServices from "@/services/categoryServices";
 
 // State
-const categories = ref([
-  {
-    id: 1,
-    title: "Danh mục mẫu 1",
-    slug: "danh-muc-mau-1",
-    createdAt: new Date("2024-01-01"),
-  },
-  {
-    id: 2,
-    title: "Danh mục mẫu 2",
-    slug: "danh-muc-mau-2",
-    createdAt: new Date("2024-01-02"),
-  },
-]);
+const categories = ref([]);
 const isEditing = ref(false);
 const editingId = ref(null);
 const isModalOpen = ref(false);
@@ -321,10 +264,8 @@ const filteredCategories = computed(() => {
   // Search
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
-    result = result.filter(
-      (category) =>
-        category.title.toLowerCase().includes(query) ||
-        category.slug.toLowerCase().includes(query)
+    result = result.filter((category) =>
+      category.title.toLowerCase().includes(query)
     );
   }
 
@@ -402,14 +343,13 @@ const validateForm = () => {
     isValid = false;
   }
 
-  // Kiểm tra trùng lặp
-  const existingCategory = categories.value.find(
-    (cat) => cat.slug === categoryForm.slug && cat.id !== editingId.value
-  );
-  if (existingCategory) {
-    formErrors.slug = "Slug đã tồn tại";
-    isValid = false;
-  }
+  // const existingCategory = categories.value.find(
+  //   (cat) => cat.slug === categoryForm.slug && cat.id !== editingId.value
+  // );
+  // if (existingCategory) {
+  //   formErrors.slug = "Slug đã tồn tại";
+  //   isValid = false;
+  // }
 
   return isValid;
 };
@@ -421,7 +361,11 @@ const handleSubmit = async () => {
     isSubmitting.value = true;
 
     if (isEditing.value) {
-      // Update existing category
+      await categoryServices.update({
+        "id": editingId.value, 
+        'title': categoryForm.title, 
+        'slug': categoryForm.slug
+      });
       const index = categories.value.findIndex(
         (cat) => cat.id === editingId.value
       );
@@ -433,30 +377,49 @@ const handleSubmit = async () => {
         };
       }
     } else {
-      // Add new category
-      const newCategory = {
-        id: Date.now(), // Simple ID generation
-        title: categoryForm.title,
-        slug: categoryForm.slug,
-        createdAt: new Date(),
-      };
-      categories.value.push(newCategory);
+      try {
+        const response = await categoryServices.create(categoryForm);
+        
+        if (response && response.data && response.data.data) {
+          const data = response.data.data;
+          const newCategory = {
+            id: data.id,
+            title: data.title,
+            slug: data.slug,
+            createdAt: data.createdAt || new Date().toISOString(),
+          };
+          categories.value.push(newCategory);
+        } else {
+          console.error("Unexpected response structure:", response);
+          alert("Failed to create category. Unexpected server response.");
+        }
+      } catch (createError) {
+        console.error("Error creating category:", createError);
+        alert("Failed to create category. Please try again.");
+      }
     }
 
-    // Close modal after successful submission
     closeModal();
   } catch (error) {
     console.error("Error submitting form:", error);
+    alert("An error occurred. Please try again.");
   } finally {
     isSubmitting.value = false;
   }
 };
 
+onBeforeMount(async () => {
+  await categoryServices.gets().then((response) => {
+    categories.value = response.data.data;
+    
+  });
+});
+
 const deleteCategory = async (id) => {
   if (!confirm("Bạn có chắc chắn muốn xóa danh mục này?")) return;
 
   try {
-    // Remove category from list
+    await categoryServices.delete(id)
     categories.value = categories.value.filter((cat) => cat.id !== id);
   } catch (error) {
     console.error("Error deleting category:", error);

@@ -5,9 +5,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,8 +26,7 @@ import jakarta.persistence.TemporalType;
 @Table(name = "question")
 public class Question {
 	@Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
     @Column(name = "question_text", nullable = false)
     private String questionText;
@@ -37,15 +39,19 @@ public class Question {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
     
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(mappedBy = "question",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers = new ArrayList<>();
 
     @PrePersist
-    protected void onCreate() {
+	protected void onCreate() {
+		if (id == null || id.isEmpty()) {
+            id = UUID.randomUUID().toString();
+        }
         createdAt = new Date();
-    }
+	}
 
-	public Question(UUID id, String questionText, Quiz quiz, Date createdAt) {
+	public Question(String id, String questionText, Quiz quiz, Date createdAt) {
 		super();
 		this.id = id;
 		this.questionText = questionText;
@@ -65,11 +71,11 @@ public class Question {
 		this.answers = answers;
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

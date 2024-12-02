@@ -9,11 +9,11 @@
                         <h1 class="text-4xl font-bold mb-4">{{ currentCourse?.title }}</h1>
                         <p class="text-xl mb-6">{{ currentCourse?.description }}</p>
                         <div class="flex items-center space-x-4" v-if="courseInstructor">
-                            <img :src="courseInstructor.avatar" :alt="courseInstructor.name"
+                            <img :src="courseInstructor.avatar" :alt="courseInstructor.firstName"
                                 class="w-12 h-12 rounded-full">
                             <div>
-                                <p class="font-medium">{{ courseInstructor.name }}</p>
-                                <p class="text-sm opacity-80">{{ courseInstructor.title }}</p>
+                                <p class="font-medium">{{ courseInstructor.firstName + " " + courseInstructor.lastName
+                                    }}</p>
                             </div>
                         </div>
                     </div>
@@ -55,7 +55,6 @@
                                     <span>Truy cập trọn đời</span>
                                 </div>
                             </div>
-                            <p class="text-gray-600">{{ currentCourse?.fullDescription }}</p>
                         </div>
 
                         <!-- Course Content -->
@@ -72,17 +71,8 @@
                                             </span>
                                             <div>
                                                 <h3 class="font-medium">{{ lecture.title }}</h3>
-                                                <p class="text-sm text-gray-500">45 phút</p>
                                             </div>
                                         </div>
-                                        <button class="text-blue-600 hover:text-blue-700">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -95,10 +85,6 @@
                             <div class="flex items-center justify-center space-x-2 mb-6">
                                 <span class="text-3xl font-bold text-blue-600">{{ formatPrice(currentCourse?.price)
                                     }}</span>
-                                <div class="flex items-center ml-4">
-                                    <span class="text-yellow-400 mr-1">★</span>
-                                    <span class="font-medium">{{ currentCourse?.rating }}</span>
-                                </div>
                             </div>
                             <button
                                 class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors mb-4">
@@ -139,34 +125,60 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onBeforeMount } from 'vue'
 import { useRoute } from 'vue-router'
 import instructors from '@/faker/instructors'
-import lectures from '@/faker/lectures'
+
 import courses from '@/faker/course'
 import DefaultLayout from '@/layouts/user/DefaultLayout.vue'
+import courseServices from '@/services/courseServices'
+import lectureServices from '@/services/lectureServices'
 
 const route = useRoute()
-// Giả sử chúng ta đang xem khóa học có id = 9
-const courseId = route.query.course
 
-// Lấy thông tin khóa học hiện tại
-const currentCourse = computed(() => {
-    return courses.find(course => course.id == courseId)
+const courseId = route.query.course
+const lectures = ref([])
+const currentCourse = ref({})
+// Lấy danh sách bài giảng của khóa học
+const courseLectures = computed(() => {
+
+    return lectures.value = lectures.value
+        .filter(lecture => lecture.course.id == courseId)
+        .sort((a, b) => a.title.localeCompare(b.title));
+})
+const fetchCourse = async () => {
+    await courseServices.get(courseId)
+        .then(response => {
+            currentCourse.value = response.data.data
+        })
+        .catch(error => {
+            console.error(error)
+        })
+}
+const fetchLecture = async () => {
+    await lectureServices.gets()
+        .then(response => {
+            lectures.value = response.data.data
+        })
+        .catch(error => {
+            console.error(error)
+        })
+}
+onBeforeMount(() => {
+    fetchCourse()
+    fetchLecture()
+    // fetchCategory()
 })
 
 // Lấy thông tin giảng viên của khóa học
 const courseInstructor = computed(() => {
     if (currentCourse.value) {
-        return instructors.find(instructor => instructor.id == currentCourse.value.create_by)
+        return currentCourse.value.create_by
     }
     return null
 })
 
-// Lấy danh sách bài giảng của khóa học
-const courseLectures = computed(() => {
-    return lectures.filter(lecture => lecture.course_id == courseId)
-})
+
 
 // Tính tổng thời lượng khóa học (giả định mỗi bài 45 phút)
 const courseDuration = computed(() => {
