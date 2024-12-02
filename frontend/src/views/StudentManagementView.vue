@@ -22,7 +22,6 @@
                 placeholder="Tìm kiếm học viên..."
                 class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
-             
             </div>
             <div class="relative">
               <select
@@ -59,11 +58,7 @@
                   >
                     Thanh toán
                   </th>
-                  <th
-                    class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Trạng thái
-                  </th>
+
                   <th
                     class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
@@ -153,11 +148,7 @@
                       </div>
                     </div>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span :class="getStatusClass(student.status)">
-                      {{ getStatusText(student.status) }}
-                    </span>
-                  </td>
+
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center space-x-3">
                       <button
@@ -180,8 +171,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onBeforeMount } from "vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
+import oauthServices from "@/services/oauthServices";
 
 // State
 const students = ref([
@@ -205,22 +197,6 @@ const students = ref([
         paymentStatus: "paid",
       },
     ],
-    status: "active",
-  },
-  {
-    id: 2,
-    name: "Trần Thị B",
-    email: "tranthib@example.com",
-    courses: [
-      {
-        id: 3,
-        name: "Node.js Backend",
-        status: "in_progress",
-        payment: 6000000,
-        paymentStatus: "partial",
-      },
-    ],
-    status: "active",
   },
 ]);
 
@@ -248,27 +224,18 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-const getStatusClass = (status) => {
-  const classes = {
-    active: "bg-green-100 text-green-800",
-    inactive: "bg-yellow-100 text-yellow-800",
-    graduated: "bg-blue-100 text-blue-800",
-  };
-  return `px-3 py-1 rounded-full text-sm font-medium ${classes[status]}`;
-};
-
-const getStatusText = (status) => {
-  const texts = {
-    active: "Đang học",
-    inactive: "Tạm dừng",
-    graduated: "Đã tốt nghiệp",
-  };
-  return texts[status];
-};
-
 const deleteStudent = (id) => {
   if (confirm("Bạn có chắc chắn muốn xóa học viên này?")) {
     students.value = students.value.filter((s) => s.id !== id);
   }
 };
+
+onBeforeMount(async () => {
+  await oauthServices.gets().then((res) => {
+    const data = res.data.data;
+    students.value = data.filter((student) => student.role === "STUDENT");
+    console.log(students.value);
+    
+  });
+});
 </script>

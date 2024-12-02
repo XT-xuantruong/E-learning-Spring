@@ -4,7 +4,7 @@
       <div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="flex justify-between items-center mb-8">
-          <h2 class="text-2xl font-bold text-gray-800">Quản lý khóa học</h2>
+          <h2 class="text-2xl font-bold text-gray-800">Course Management</h2>
           <button
             @click="openAddModal"
             class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center gap-2"
@@ -23,7 +23,7 @@
                 d="M12 6v6m0 0v6m0-6h6m-6 0H6"
               />
             </svg>
-            Thêm khóa học mới
+            Add New Course
           </button>
         </div>
 
@@ -31,7 +31,7 @@
         <div class="bg-white rounded-lg shadow overflow-hidden">
           <div class="overflow-x-auto m-4">
             <!-- Search Bar -->
-            <div class="hidden md:flex items-center">
+            <div class="hidden md:flex items-center mb-3">
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
                   <i class="fas fa-search text-gray-400"></i>
@@ -44,33 +44,26 @@
                 />
               </div>
             </div>
-            <table class="min-w-full divide-y divide-gray-200 mt-3">
+            <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Hình ảnh
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Image
                   </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Tiêu đề
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Title
                   </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Mô tả
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Description
                   </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Danh mục
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Category
                   </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Thao tác
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Price
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
                   </th>
                 </tr>
               </thead>
@@ -96,9 +89,10 @@
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {{ getCategoryName(course.category_id) }}
                   </td>
-                  <td
-                    class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2"
-                  >
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ formatPrice(course.price) }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                     <button
                       @click="openEditModal(course)"
                       class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md hover:bg-indigo-100 transition-colors duration-200"
@@ -128,13 +122,13 @@
             @click.stop
           >
             <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">
-              {{ isEditing ? "Sửa khóa học" : "Thêm khóa học mới" }}
+              {{ isEditing ? "Edit Course" : "Add New Course" }}
             </h3>
 
             <form @submit.prevent="handleSubmit" class="space-y-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Tiêu đề
+                  Title
                 </label>
                 <input
                   v-model="formData.title"
@@ -146,7 +140,7 @@
 
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Mô tả
+                  Description
                 </label>
                 <textarea
                   v-model="formData.description"
@@ -156,9 +150,24 @@
                 ></textarea>
               </div>
 
+              <!-- Price Field -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Hình ảnh
+                  Course Price
+                </label>
+                <input
+                  v-model="formData.price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  required
+                  class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Image
                 </label>
                 <div class="mt-1 flex items-center space-x-4">
                   <div
@@ -171,7 +180,7 @@
                       class="w-full h-full object-cover"
                     />
                     <div v-else class="text-gray-400 text-sm text-center p-2">
-                      Chưa có ảnh
+                      No image
                     </div>
                     <input
                       type="file"
@@ -186,14 +195,14 @@
                     v-if="imagePreview"
                     class="text-sm text-red-600 hover:text-red-800"
                   >
-                    Xóa ảnh
+                    Remove Image
                   </button>
                 </div>
               </div>
 
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Danh mục
+                  Category
                 </label>
                 <select
                   v-model="formData.category_id"
@@ -216,13 +225,13 @@
                   @click="closeModal"
                   class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
-                  Hủy
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
-                  {{ isEditing ? "Cập nhật" : "Thêm mới" }}
+                  {{ isEditing ? "Update" : "Add" }}
                 </button>
               </div>
             </form>
@@ -252,7 +261,7 @@ const selectedFile = ref(null);
 const searchQuery = ref("");
 
 const formData = reactive({
-  price: 30000,
+  price: 30000.00, // Default price as float
 });
 
 const filteredCourses = computed(() => {
@@ -264,7 +273,14 @@ const filteredCourses = computed(() => {
   );
 });
 
-// Methods
+
+const formatPrice = (amount) => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(amount);
+};
+// Methods remain the same as in the previous version
 const handleImageChange = (event) => {
   const file = event.target.files[0];
   if (file) {
@@ -287,7 +303,7 @@ const removeImage = () => {
 
 const getCategoryName = (categoryId) => {
   const category = categories.value.find((c) => c.id === categoryId);
-  return category ? category.title : "Không có danh mục";
+  return category ? category.title : "No Category";
 };
 
 const openAddModal = () => {
@@ -302,6 +318,7 @@ const openEditModal = (course) => {
   formData.description = course.description;
   formData.thumbnail = course.thumbnail;
   formData.category_id = course.category_id;
+  formData.price = course.price;
   imagePreview.value = course.thumbnail;
   showModal.value = true;
 };
@@ -317,6 +334,7 @@ const resetForm = () => {
   formData.description = "";
   formData.thumbnail = "";
   formData.category_id = "";
+  formData.price = 30000.00; // Reset to default price
   imagePreview.value = null;
   selectedFile.value = null;
 };
@@ -346,8 +364,8 @@ const handleSubmit = async () => {
 };
 
 const deleteCourse = async (id) => {
-  if (confirm("Bạn có chắc chắn muốn xóa khóa học này?")) {
-    await courseServices.delete(id);
+  if (confirm("Are you sure you want to delete this course?")) {
+    await courseServices.delete(formData);
     courses.value = courses.value.filter((course) => course.id !== id);
   }
 };

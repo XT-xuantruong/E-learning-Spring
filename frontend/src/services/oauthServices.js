@@ -74,7 +74,7 @@ class OauthServices extends ApiService {
   async gets(access, params) {
     const option = {
       method: "get",
-      url: `/${this.entity}/getall/`,
+      url: `/${this.entity}`,
       headers: {
         Authorization: `Bearer ${access}`,
       },
