@@ -55,7 +55,7 @@ class OauthServices extends ApiService {
 
   async logout(access, refresh) {
     console.log(access, refresh);
-    
+
     const data = {
       access_token: access,
       refresh_token: refresh,
@@ -83,15 +83,10 @@ class OauthServices extends ApiService {
     return this.request(option);
   }
 
-  async getme(access, id) {
-    console.log(access);
-
+  async getme(id) {
     const option = {
       method: "get",
-      url: `/${this.entity}/detail-user/${id}/`,
-      headers: {
-        Authorization: `Bearer ${access}`,
-      },
+      url: `/${this.entity}/${id}`,
     };
     return this.request(option);
   }
@@ -99,17 +94,26 @@ class OauthServices extends ApiService {
   async updateProfile(id, data) {
     const formData = new FormData();
 
-    formData.append("name", data.name);
-    formData.append("phone", data.phone);
+    formData.append("firstName", data.firstName);
+    formData.append("lastName", data.lastName);
     formData.append("email", data.email);
     if (data.avatar) {
-      formData.append("avatar", data.avatar);
+      // Convert base64 to file
+      const base64ToFile = async (base64String) => {
+        const res = await fetch(base64String);
+        const blob = await res.blob();
+        return new File([blob], "avatar.png", { type: "image/png" });
+      };
+
+      // Add file to form data
+      const avatar = await base64ToFile(data.avatar);
+      formData.append("avatar", avatar);
     }
     console.log("FormData for update", formData);
 
     return this.request({
       method: "put",
-      url: `/${this.entity}/update-user/${id}/`,
+      url: `/${this.entity}/${id}`,
       headers: {
         "Content-Type": "multipart/form-data",
       },
