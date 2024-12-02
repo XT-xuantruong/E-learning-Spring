@@ -74,13 +74,6 @@
                 >
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
-                      <div class="flex-shrink-0 h-10 w-10">
-                        <img
-                          class="h-10 w-10 rounded-full object-cover"
-                          src=""
-                          :alt="student.name"
-                        />
-                      </div>
                       <div class="ml-4">
                         <div class="text-sm font-medium text-gray-900">
                           {{ student.name }}
@@ -93,26 +86,37 @@
                   </td>
                   <td class="px-6 py-4">
                     <div class="space-y-3">
-                      <div
-                        v-for="course in student.courses"
-                        :key="course.id"
-                        class="flex items-center space-x-2"
-                      >
-                        <span
-                          :class="[
-                            'w-5 h-5 flex items-center justify-center rounded-full border',
-                            course.status === 'completed'
-                              ? 'bg-green-500 border-green-500 text-white'
-                              : 'border-gray-300',
-                          ]"
+                      <div>
+                        <template
+                          v-if="student.courses && student.courses.length > 0"
                         >
-                          <template v-if="course.status === 'completed'"
-                            >✓</template
+                          <div
+                            v-for="course in student.courses"
+                            :key="course.id"
+                            class="flex items-center space-x-2"
                           >
-                        </span>
-                        <span class="text-sm font-medium text-gray-900">
-                          {{ course.name }}
-                        </span>
+                            <span
+                              :class="[
+                                'w-5 h-5 flex items-center justify-center rounded-full border',
+                                course.status === 'completed'
+                                  ? 'bg-green-500 border-green-500 text-white'
+                                  : 'border-gray-300',
+                              ]"
+                              role="status"
+                              :aria-label="`Course ${course.name} status`"
+                            >
+                              <template v-if="course.status === 'completed'"
+                                >✓</template
+                              >
+                            </span>
+                            <span class="text-sm font-medium text-gray-900">
+                              {{ course.name }}
+                            </span>
+                          </div>
+                        </template>
+                        <div v-else class="text-gray-500">
+                          Chưa đăng ký khóa học nào
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -174,31 +178,11 @@
 import { ref, computed, onBeforeMount } from "vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import oauthServices from "@/services/oauthServices";
+import courseEnrollmentServices from "@/services/courseEnrollmentServices";
+import { useAdminStore } from "@/stores/admin";
 
 // State
-const students = ref([
-  {
-    id: 1,
-    name: "Nguyễn Văn A",
-    email: "nguyenvana@example.com",
-    courses: [
-      {
-        id: 1,
-        name: "Vue.js Advanced",
-        status: "completed",
-        payment: 5000000,
-        paymentStatus: "paid",
-      },
-      {
-        id: 2,
-        name: "React Fundamentals",
-        status: "completed",
-        payment: 4500000,
-        paymentStatus: "paid",
-      },
-    ],
-  },
-]);
+const students = ref([]);
 
 const searchQuery = ref("");
 const filterStatus = ref("");
@@ -224,8 +208,11 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-const deleteStudent = (id) => {
+const deleteStudent = async (id) => {
   if (confirm("Bạn có chắc chắn muốn xóa học viên này?")) {
+    const adminStore = useAdminStore();
+
+    await oauthServices.delete(id, adminStore.admin.access);
     students.value = students.value.filter((s) => s.id !== id);
   }
 };
@@ -233,9 +220,40 @@ const deleteStudent = (id) => {
 onBeforeMount(async () => {
   await oauthServices.gets().then((res) => {
     const data = res.data.data;
-    students.value = data.filter((student) => student.role === "STUDENT");
+    const dataStudents = data.filter((student) => student.role === "STUDENT");
+    dataStudents.forEach((student) => {
+      student.name = student.firstName + student.lastName;
+      students.value = [...students.value, { ...student, courses: [] }];
+    });
+
+    data.forEach(async (value) => {
+      await courseEnrollmentServices
+        .getbyuser({ userId: value.id })
+        .then((res) => {
+          if (res.status === 200) {
+            const courseData = res.data.data;
+
+            courseData.forEach(async (course) => {
+              const student = students.value.find(
+                (s) => s.id === course.user.id
+              );
+              if (student) {
+                student.courses.push({
+                  id: course.id,
+                  name:
+                    course.course.title !== null
+                      ? course.course.title
+                      : "no courses",
+                  status: course.finish ? "completed" : "in_progress",
+                  payment: course.course.price,
+                  paymentStatus: course.paid ? "paid" : "partial",
+                });
+              }
+            });
+          }
+        });
+    });
     console.log(students.value);
-    
   });
 });
 </script>

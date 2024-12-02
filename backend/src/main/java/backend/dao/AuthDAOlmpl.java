@@ -8,6 +8,8 @@ import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import backend.entity.Category;
 import backend.entity.User;
 
 @Repository
@@ -60,4 +62,14 @@ public class AuthDAOlmpl implements AuthDao {
         return user;
        
     }
+    
+    @Override
+	@Transactional
+	public void deleteById(String id) {
+		Session currentSession = sessionFactory.getCurrentSession();
+		User theUser = currentSession.get(User.class, id);
+        currentSession.remove(theUser);
+		
+	}
+	
 }

@@ -651,45 +651,56 @@ const removeAnswerField = (index) => {
 
 onBeforeMount(async () => {
   try {
-    const [answersResponse, questionsResponse, quizzesResponse] =
+    const [quizzesResponse, questionsResponse, answersResponse] =
       await Promise.all([
-        answerServices.gets().then(),
-        questionServices.gets(),
         quizServices.gets(),
+        questionServices.gets(),
+        answerServices.gets(),
       ]);
-
-    const answers = [...answersResponse.data.data];
-    const questions = [...questionsResponse.data.data];
     const quizData = quizzesResponse.data.data;
 
-    answers.forEach((answer) => {
-      answer.answer_text = answer.answerText;
-      answer.is_correct = answer.correct;
-    });
 
-    questions.forEach((question) => {
-      question.question = question.questionText;
-    });
-
-    quizzes.value = quizData.map((element) => {
-      const questionOfQuiz = questions.filter(
-        (question) => question.quiz.id === element.id
-      );
-
-      questionOfQuiz.forEach((question) => {
-        const answerOfQuestion = answers.filter(
-          (answer) => answer.question.id === question.id
-        );
-        question.answers = answerOfQuestion;
+    if (answersResponse.status !== 204 && questionsResponse.status !== 204) {
+      const questions = [...questionsResponse.data.data];
+      const answers = [...answersResponse.data.data];
+      answers.forEach((answer) => {
+        answer.answer_text = answer.answerText;
+        answer.is_correct = answer.correct;
       });
 
-      return {
-        ...element,
-        name: element.title,
-        course_id: element.course.id,
-        questions: questionOfQuiz,
-      };
-    });
+      questions.forEach((question) => {
+        question.question = question.questionText;
+      });
+
+      quizzes.value = quizData.map((element) => {
+        const questionOfQuiz = questions.filter(
+          (question) => question.quiz.id === element.id
+        );
+
+        questionOfQuiz.forEach((question) => {
+          const answerOfQuestion = answers.filter(
+            (answer) => answer.question.id === question.id
+          );
+          question.answers = answerOfQuestion;
+        });
+
+        return {
+          ...element,
+          name: element.title,
+          course_id: element.course.id,
+          questions: questionOfQuiz,
+        };
+      });
+    } else {
+      quizzes.value = quizData.map((element) => {
+        return {
+          ...element,
+          name: element.title,
+          course_id: element.course.id,
+          questions: [],
+        };
+      });
+    }
   } catch (error) {
     console.error("Error fetching data:", error);
   }

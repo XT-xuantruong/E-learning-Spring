@@ -101,7 +101,7 @@ const editQuiz = (quiz) => {
 
 const deleteQuiz = async (id) => {
   if (!confirm("Are you sure you want to delete this quiz?")) return;
-  await quizServices.delete(id)
+  await quizServices.delete(id);
   const index = quizzes.value.findIndex((q) => q.id === id);
   quizzes.value.splice(index, 1);
 };
@@ -126,14 +126,6 @@ const formatDate = (date) => {
 // Lifecycle hooks
 onBeforeMount(async () => {
   try {
-    await quizServices.gets().then((res) => {
-      const data = res.data.data;
-      data.forEach((element) => {
-        element.course_id = element.course.id;
-      });
-      quizzes.value = data;
-    });
-
     const response = await courseServices.gets();
     const data = response.data.data;
 
@@ -144,6 +136,13 @@ onBeforeMount(async () => {
 
     courses.value = data;
     console.log(courses.value);
+    await quizServices.gets().then((res) => {
+      const data = res.data.data;
+      data.forEach((element) => {
+        element.course_id = element.course.id;
+      });
+      quizzes.value = data;
+    });
   } catch (error) {
     console.error("Error fetching courses:", error);
   }

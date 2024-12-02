@@ -39,7 +39,7 @@ class CourseEnrollmentServices extends ApiService {
     });
   }
   async getbyuser(params) {
-    console.log(1);
+    console.log(params);
 
     const option = {
       method: "get",

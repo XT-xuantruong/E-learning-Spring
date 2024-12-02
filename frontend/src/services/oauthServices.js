@@ -120,7 +120,7 @@ class OauthServices extends ApiService {
   async delete(id, access) {
     return this.request({
       method: "delete",
-      url: `/${this.entity}/delete-user/${id}/`,
+      url: `/${this.entity}/${id}`,
       headers: {
         Authorization: `Bearer ${access}`,
       },

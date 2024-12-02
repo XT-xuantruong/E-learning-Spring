@@ -147,6 +147,20 @@ const getCourseName = (courseId) => {
 };
 
 onBeforeMount(async () => {
+  // await courseServices.gets().then((res)=>{
+  //   console.log(res.data);
+    
+  // })
+  await courseServices.gets().then((response) => {
+    const data = response.data.data;
+
+    data.forEach((element) => {
+      element.category_id = element.category_id.id;
+    });
+
+    courses.value = data;
+    
+  });
   await lectureServices.gets().then((response) => {
     const data = response.data.data;
     data.forEach((element) => {
@@ -161,16 +175,7 @@ onBeforeMount(async () => {
     console.log(lectures.value);
   });
 
-  await courseServices.gets().then((response) => {
-    const data = response.data.data;
-
-    data.forEach((element) => {
-      element.category_id = element.category_id.id;
-    });
-
-    courses.value = data;
-    
-  });
+ 
 });
 
 const formatDate = (date) => {

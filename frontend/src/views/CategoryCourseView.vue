@@ -75,52 +75,10 @@
           <div class="col-span-2 text-right">Thao tác</div>
         </div>
 
-        <!-- Empty State -->
-        <div v-if="filteredCategories.length === 0" class="py-12 text-center">
-          <svg
-            class="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-            />
-          </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">
-            Chưa có danh mục nào
-          </h3>
-          <p class="mt-1 text-sm text-gray-500">
-            Bắt đầu bằng việc tạo danh mục mới.
-          </p>
-          <div class="mt-6">
-            <button
-              @click="openModal()"
-              class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-            >
-              <svg
-                class="-ml-1 mr-2 h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Thêm danh mục mới
-            </button>
-          </div>
-        </div>
+ 
 
         <!-- Categories List -->
-        <div v-else>
+        <div>
           <div
             v-for="(category, index) in filteredCategories"
             :key="category.id"
@@ -385,13 +343,13 @@ const validateForm = () => {
     isValid = false;
   }
 
-  const existingCategory = categories.value.find(
-    (cat) => cat.slug === categoryForm.slug && cat.id !== editingId.value
-  );
-  if (existingCategory) {
-    formErrors.slug = "Slug đã tồn tại";
-    isValid = false;
-  }
+  // const existingCategory = categories.value.find(
+  //   (cat) => cat.slug === categoryForm.slug && cat.id !== editingId.value
+  // );
+  // if (existingCategory) {
+  //   formErrors.slug = "Slug đã tồn tại";
+  //   isValid = false;
+  // }
 
   return isValid;
 };
@@ -403,7 +361,11 @@ const handleSubmit = async () => {
     isSubmitting.value = true;
 
     if (isEditing.value) {
-      await categoryServices.update({"id": editingId.value, 'title': categoryForm.title, 'slug': categoryForm.slug});
+      await categoryServices.update({
+        "id": editingId.value, 
+        'title': categoryForm.title, 
+        'slug': categoryForm.slug
+      });
       const index = categories.value.findIndex(
         (cat) => cat.id === editingId.value
       );
@@ -415,21 +377,32 @@ const handleSubmit = async () => {
         };
       }
     } else {
-      await categoryServices.create(categoryForm).then((response) => {
-        const data = response.data.data;
-        const newCategory = {
-          id: data.id,
-          title: data.title,
-          slug: data.slug,
-          createdAt: data.createdAt,
-        };
-        categories.value.push(newCategory);
-      });
+      try {
+        const response = await categoryServices.create(categoryForm);
+        
+        if (response && response.data && response.data.data) {
+          const data = response.data.data;
+          const newCategory = {
+            id: data.id,
+            title: data.title,
+            slug: data.slug,
+            createdAt: data.createdAt || new Date().toISOString(),
+          };
+          categories.value.push(newCategory);
+        } else {
+          console.error("Unexpected response structure:", response);
+          alert("Failed to create category. Unexpected server response.");
+        }
+      } catch (createError) {
+        console.error("Error creating category:", createError);
+        alert("Failed to create category. Please try again.");
+      }
     }
 
     closeModal();
   } catch (error) {
     console.error("Error submitting form:", error);
+    alert("An error occurred. Please try again.");
   } finally {
     isSubmitting.value = false;
   }

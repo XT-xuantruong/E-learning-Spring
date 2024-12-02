@@ -61,6 +61,11 @@ public class AuthServicelmpl implements AuthService  {
     }
     
     @Override
+	public void deleteById(String id) {
+    	userDao.deleteById(id);
+	}
+    
+    @Override
     @Transactional
     public User updateUser(String id, User updatedUser) {
         User existingUser = userDao.findById(id);

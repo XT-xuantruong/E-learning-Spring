@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import backend.entity.Category;
 import backend.entity.Role; 
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -126,7 +127,22 @@ public class AuthController {
         }
     }
     
-    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<User>> deleteUser(@PathVariable String id) {
+        try {
+        	User userDelete = authService.findById(id);
+        	if (userDelete == null) {
+        		ApiResponse<User> response = new ApiResponse<>("error", "Not exists",null);
+                return ResponseEntity.ok(response);
+        	}
+        	authService.deleteById(id);
+            ApiResponse<User> response = new ApiResponse<>("ok", "Successfully", userDelete);
+            return ResponseEntity.ok(response);
+    	} catch (Exception e) {
+    		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+    				.body(new ApiResponse<>("error", e.getMessage(), null));
+    	}
+    }
     
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<User>> updateUser(

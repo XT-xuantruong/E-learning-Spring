@@ -10,6 +10,7 @@ public interface AuthService {
 	public User createUser(User user) ;
 	public Map<String, Object> login(String email, String password) ;
 	public void logout(String token) ;
+	public void deleteById(String id);
 	List<User> getAllUsers();
 	User updateUser(String id, User user);
 }
