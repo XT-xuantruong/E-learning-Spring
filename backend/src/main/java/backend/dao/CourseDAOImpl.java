@@ -83,7 +83,7 @@ public class CourseDAOImpl implements CourseDAO{
 	    
 	    // Get lectures
 	    List<Object[]> lectures = currentSession.createQuery(
-	        "SELECT l.id, l.title " +
+	        "SELECT l.id, l.title, l.content " +
 	        "FROM Lecture l " +
 	        "WHERE l.course.id = :courseId",
 	        Object[].class
@@ -96,6 +96,7 @@ public class CourseDAOImpl implements CourseDAO{
 	        LectureDTO lecture = new LectureDTO();
 	        lecture.setId((String) row[0]);
 	        lecture.setTitle((String) row[1]);
+	        lecture.setContent((String) row[2]);
 	        lectureDTOs.add(lecture);
 	    }
 	    courseDTO.setLectures(lectureDTOs);
