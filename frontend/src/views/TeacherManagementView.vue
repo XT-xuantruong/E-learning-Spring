@@ -33,7 +33,7 @@ const fetchTeachers = async () => {
       response.data.data.filter((ele) => ele.role === "TEACHER") || [];
   } catch (error) {
     console.error("Error fetching teachers:", error);
-    alert("Không thể tải danh sách giáo viên");
+    alert("Unable to load teacher list");
   }
 };
 
@@ -61,7 +61,7 @@ const handleFileSelect = (event) => {
       };
       reader.readAsDataURL(file);
     } else {
-      alert("Vui lòng chọn tệp hình ảnh");
+      alert("Please select an image file");
     }
   }
 };
@@ -87,7 +87,7 @@ const updateTeacher = async () => {
         teachers.value[index] = response.data.data;
       }
 
-      alert("Cập nhật giáo viên thành công");
+      alert("Teacher updated successfully");
     } else {
       const signupData = {
         ...formData.value,
@@ -98,25 +98,25 @@ const updateTeacher = async () => {
 
       const response = await oauthServices.signup(signupData);
       teachers.value.push(response.data.data);
-      alert("Thêm giáo viên thành công");
+      alert("Teacher added successfully");
     }
 
     resetForm();
   } catch (error) {
     console.error("Error updating/creating teacher:", error);
-    alert(error.response?.data?.message || "Có lỗi xảy ra. Vui lòng thử lại.");
+    alert(error.response?.data?.message || "An error occurred. Please try again.");
   }
 };
 
 const deleteTeacher = async (id) => {
-  if (confirm("Bạn có chắc muốn xóa giáo viên này?")) {
+  if (confirm("Are you sure you want to delete this teacher?")) {
     try {
       await oauthServices.delete(id, user.accessToken);
       teachers.value = teachers.value.filter((t) => t.id !== id);
-      alert("Xóa giáo viên thành công");
+      alert("Teacher deleted successfully");
     } catch (error) {
       console.error("Error deleting teacher:", error);
-      alert(error.response?.data?.message || "Không thể xóa giáo viên");
+      alert(error.response?.data?.message || "Cannot delete teacher");
     }
   }
 };
@@ -127,9 +127,9 @@ const editTeacher = (teacher) => {
     firstName: teacher.firstName,
     lastName: teacher.lastName,
     email: teacher.email,
-    avatar: teacher.avatar ,
+    avatar: teacher.avatar,
   };
-  previewUrl.value = teacher.avatar ;
+  previewUrl.value = teacher.avatar;
   isEditing.value = true;
   showModal.value = true;
 };
@@ -158,24 +158,19 @@ onBeforeMount(fetchTeachers);
 </script>
 
 <template>
-  <!-- Template remains the same as previous version -->
   <DefaultLayout>
     <div class="min-h-screen bg-gray-50 p-6">
-      <!-- Main Container -->
       <div class="max-w-7xl mx-auto">
-        <!-- Header Section -->
         <div class="mb-8">
           <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-gray-900">Quản lý giáo viên</h1>
-            
+            <h1 class="text-3xl font-bold text-gray-900">Teacher Management</h1>
           </div>
 
-          <!-- Search and Filter Section -->
           <div class="relative mb-6">
             <input
               type="text"
               v-model="searchQuery"
-              placeholder="Tìm kiếm giáo viên..."
+              placeholder="Search teachers..."
               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
             <div
@@ -198,7 +193,6 @@ onBeforeMount(fetchTeachers);
           </div>
         </div>
 
-        <!-- Teachers Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div
             v-for="teacher in filteredTeachers"
@@ -219,7 +213,7 @@ onBeforeMount(fetchTeachers);
                   <p class="text-sm text-gray-500 truncate">
                     {{ teacher.email }}
                   </p>
-                  <p class="text-xs text-gray-400 mt-1">Giáo viên</p>
+                  <p class="text-xs text-gray-400 mt-1">Teacher</p>
                 </div>
               </div>
 
@@ -241,7 +235,7 @@ onBeforeMount(fetchTeachers);
                       d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
                     />
                   </svg>
-                  Sửa
+                  Edit
                 </button>
                 <button
                   @click="deleteTeacher(teacher.id)"
@@ -260,7 +254,7 @@ onBeforeMount(fetchTeachers);
                       d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                     />
                   </svg>
-                  Xóa
+                  Delete
                 </button>
               </div>
             </div>
@@ -268,7 +262,6 @@ onBeforeMount(fetchTeachers);
         </div>
       </div>
 
-      <!-- Modal (remains the same) -->
       <div
         v-if="showModal"
         class="modal-overlay fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50"
@@ -278,21 +271,19 @@ onBeforeMount(fetchTeachers);
           class="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 transform transition-all"
           @click.stop
         >
-          <!-- Modal Header -->
           <div class="px-6 py-4 border-b border-gray-200">
             <h2 class="text-xl font-semibold text-gray-900">
-              {{ isEditing ? "Sửa thông tin giáo viên" : "Thêm giáo viên mới" }}
+              {{ isEditing ? "Edit Teacher Information" : "Add New Teacher" }}
             </h2>
           </div>
 
-          <!-- Modal Body -->
           <div class="px-6 py-4">
             <form @submit.prevent="updateTeacher()">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2"
-                    >Họ</label
-                  >
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    First Name
+                  </label>
                   <input
                     v-model="formData.firstName"
                     type="text"
@@ -301,9 +292,9 @@ onBeforeMount(fetchTeachers);
                   />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2"
-                    >Tên</label
-                  >
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Last Name
+                  </label>
                   <input
                     v-model="formData.lastName"
                     type="text"
@@ -312,9 +303,9 @@ onBeforeMount(fetchTeachers);
                   />
                 </div>
                 <div class="md:col-span-2">
-                  <label class="block text-sm font-medium text-gray-700 mb-2"
-                    >Email</label
-                  >
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Email
+                  </label>
                   <input
                     v-model="formData.email"
                     type="email"
@@ -323,9 +314,9 @@ onBeforeMount(fetchTeachers);
                   />
                 </div>
                 <div class="md:col-span-2">
-                  <label class="block text-sm font-medium text-gray-700 mb-2"
-                    >Ảnh đại diện</label
-                  >
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Avatar
+                  </label>
                   <div class="flex items-center space-x-4">
                     <img
                       :src="previewUrl"
@@ -342,20 +333,19 @@ onBeforeMount(fetchTeachers);
                 </div>
               </div>
 
-              <!-- Modal Footer -->
               <div class="mt-6 flex justify-end space-x-3">
                 <button
                   type="button"
                   @click="resetForm"
                   class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
-                  Hủy
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
-                  {{ isEditing ? "Cập nhật" : "Lưu" }}
+                  {{ isEditing ? "Update" : "Save" }}
                 </button>
               </div>
             </form>

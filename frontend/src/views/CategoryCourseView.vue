@@ -6,9 +6,9 @@
       <div class="mb-8">
         <div class="flex justify-between items-center mb-4">
           <div>
-            <h2 class="text-2xl font-bold text-gray-800">Quản lý danh mục</h2>
+            <h2 class="text-2xl font-bold text-gray-800">Category Management</h2>
             <p class="text-gray-600 mt-1">
-              Quản lý tất cả danh mục của bạn tại đây
+              Manage all your categories here
             </p>
           </div>
           <button
@@ -28,7 +28,7 @@
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            Thêm danh mục mới
+            Add New Category
           </button>
         </div>
 
@@ -69,13 +69,11 @@
           class="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 rounded-t-lg border-b text-sm font-medium text-gray-700"
         >
           <div class="col-span-1">#</div>
-          <div class="col-span-4">Tên danh mục</div>
+          <div class="col-span-4">Category Name</div>
           <div class="col-span-3">Slug</div>
-          <div class="col-span-2">Ngày tạo</div>
-          <div class="col-span-2 text-right">Thao tác</div>
+          <div class="col-span-2">Created Date</div>
+          <div class="col-span-2 text-right">Actions</div>
         </div>
-
- 
 
         <!-- Categories List -->
         <div>
@@ -107,14 +105,14 @@
               <button
                 @click="openModal(category)"
                 class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md hover:bg-indigo-100 transition-colors duration-200"
-                title="Sửa"
+                title="Edit"
               >
                 <font-awesome-icon :icon="['fas', 'pen']" />
               </button>
               <button
                 @click="deleteCategory(category.id)"
                 class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md hover:bg-red-100 transition-colors duration-200"
-                title="Xóa"
+                title="Delete"
               >
                 <font-awesome-icon :icon="['fas', 'trash']" />
               </button>
@@ -150,20 +148,20 @@
           </button>
 
           <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">
-            {{ isEditing ? "Sửa danh mục" : "Thêm danh mục mới" }}
+            {{ isEditing ? "Edit Category" : "Add New Category" }}
           </h3>
 
           <form @submit.prevent="handleSubmit" class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">
-                Tên danh mục <span class="text-red-500">*</span>
+                Category Name <span class="text-red-500">*</span>
               </label>
               <input
                 v-model="categoryForm.title"
                 type="text"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 :class="{ 'border-red-300': formErrors.title }"
-                placeholder="Nhập tên danh mục"
+                placeholder="Enter category name"
                 required
               />
               <p v-if="formErrors.title" class="mt-1 text-sm text-red-500">
@@ -180,11 +178,11 @@
                 type="text"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 :class="{ 'border-red-300': formErrors.slug }"
-                placeholder="Nhập slug danh mục"
+                placeholder="Enter category slug"
                 required
               />
               <p class="mt-1 text-sm text-gray-500">
-                Slug sẽ được tự động tạo từ tên danh mục
+                Slug will be automatically generated from the category name
               </p>
               <p v-if="formErrors.slug" class="mt-1 text-sm text-red-500">
                 {{ formErrors.slug }}
@@ -197,7 +195,7 @@
                 @click="closeModal"
                 class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Hủy
+                Cancel
               </button>
               <button
                 type="submit"
@@ -224,7 +222,7 @@
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                {{ isEditing ? "Cập nhật" : "Thêm mới" }}
+                {{ isEditing ? "Update" : "Add" }}
               </button>
             </div>
           </form>
@@ -284,7 +282,7 @@ watch(
 
 // Methods
 const formatDate = (date) => {
-  return new Date(date).toLocaleDateString("vi-VN", {
+  return new Date(date).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -334,12 +332,12 @@ const validateForm = () => {
   formErrors.slug = "";
 
   if (!categoryForm.title.trim()) {
-    formErrors.title = "Tên danh mục không được để trống";
+    formErrors.title = "Category name cannot be empty";
     isValid = false;
   }
 
   if (!categoryForm.slug.trim()) {
-    formErrors.slug = "Slug không được để trống";
+    formErrors.slug = "Slug cannot be empty";
     isValid = false;
   }
 
@@ -347,7 +345,7 @@ const validateForm = () => {
   //   (cat) => cat.slug === categoryForm.slug && cat.id !== editingId.value
   // );
   // if (existingCategory) {
-  //   formErrors.slug = "Slug đã tồn tại";
+  //   formErrors.slug = "Slug already exists";
   //   isValid = false;
   // }
 
@@ -411,7 +409,6 @@ const handleSubmit = async () => {
 onBeforeMount(async () => {
   await categoryServices.gets().then((response) => {
     categories.value = response.data.data;
-    
   });
 });
 
