@@ -33,19 +33,19 @@ import { ChevronLeft, ChevronRight, Book, Users, Video, Award } from 'lucide-vue
 const slides = ref([
     {
         id: 1,
-        image: '/api/placeholder/1200/400',
+        image: 'https://png.pngtree.com/background/20220725/original/pngtree-webinar-banner-e-learning-internet-lesson-picture-image_1760342.jpg',
         title: 'Học lập trình trực tuyến',
         description: 'Khám phá hơn 1000+ khóa học chất lượng cao'
     },
     {
         id: 2,
-        image: '/api/placeholder/1200/400',
+        image: 'https://png.pngtree.com/thumb_back/fh260/back_our/20190617/ourmid/pngtree-blue-technology-e-commerce-learning-education-business-poster-banner-image_123753.jpg',
         title: 'Giảng viên hàng đầu',
         description: 'Học từ các chuyên gia trong ngành'
     },
     {
         id: 3,
-        image: '/api/placeholder/1200/400',
+        image: 'https://png.pngtree.com/thumb_back/fh260/background/20211021/pngtree-e-learning-table-information-blurs-urban-background-image_912834.png',
         title: 'Học mọi lúc mọi nơi',
         description: 'Truy cập không giới hạn trên mọi thiết bị'
     }
