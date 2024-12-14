@@ -4,9 +4,9 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900">Quản Lý Học Viên</h1>
+          <h1 class="text-3xl font-bold text-gray-900">Student Management</h1>
           <p class="mt-2 text-sm text-gray-600">
-            Quản lý thông tin và theo dõi tiến độ học tập của học viên
+            Manage student information and track learning progress
           </p>
         </div>
 
@@ -19,7 +19,7 @@
               <input
                 v-model="searchQuery"
                 type="text"
-                placeholder="Tìm kiếm học viên..."
+                placeholder="Search students..."
                 class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -28,10 +28,10 @@
                 v-model="filterStatus"
                 class="appearance-none pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
               >
-                <option value="">Tất cả trạng thái</option>
-                <option value="active">Đang học</option>
-                <option value="inactive">Tạm dừng</option>
-                <option value="graduated">Đã tốt nghiệp</option>
+                <option value="">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="inactive">Paused</option>
+                <option value="graduated">Graduated</option>
               </select>
             </div>
           </div>
@@ -46,23 +46,23 @@
                   <th
                     class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Học viên
+                    Student
                   </th>
                   <th
                     class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Khóa học & Trạng thái
+                    Courses & Status
                   </th>
                   <th
                     class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Thanh toán
+                    Payment
                   </th>
 
                   <th
                     class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Thao tác
+                    Actions
                   </th>
                 </tr>
               </thead>
@@ -115,7 +115,7 @@
                           </div>
                         </template>
                         <div v-else class="text-gray-500">
-                          Chưa đăng ký khóa học nào
+                          No courses enrolled
                         </div>
                       </div>
                     </div>
@@ -143,8 +143,8 @@
                             <span class="ml-1 text-sm">
                               {{
                                 course.paymentStatus === "paid"
-                                  ? "Đã thanh toán"
-                                  : "Thanh toán một phần"
+                                  ? "Paid"
+                                  : "Partial Payment"
                               }}
                             </span>
                           </span>
@@ -157,7 +157,7 @@
                     <div class="flex items-center space-x-3">
                       <button
                         class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md hover:bg-red-100 transition-colors duration-200"
-                        title="Xóa"
+                        title="Delete"
                         @click="deleteStudent(student.id)"
                       >
                         <font-awesome-icon :icon="['fas', 'trash']" />
@@ -202,14 +202,14 @@ const filteredStudents = computed(() => {
 
 // Methods
 const formatCurrency = (amount) => {
-  return new Intl.NumberFormat("vi-VN", {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "VND",
+    currency: "USD",
   }).format(amount);
 };
 
 const deleteStudent = async (id) => {
-  if (confirm("Bạn có chắc chắn muốn xóa học viên này?")) {
+  if (confirm("Are you sure you want to delete this student?")) {
     const adminStore = useAdminStore();
 
     await oauthServices.delete(id, adminStore.admin.access);
@@ -243,7 +243,7 @@ onBeforeMount(async () => {
                   name:
                     course.course.title !== null
                       ? course.course.title
-                      : "no courses",
+                      : "No Course",
                   status: course.finish ? "completed" : "in_progress",
                   payment: course.course.price,
                   paymentStatus: course.paid ? "paid" : "partial",

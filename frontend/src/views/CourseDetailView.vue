@@ -9,8 +9,8 @@
                         <h1 class="text-4xl font-bold mb-4">{{ currentCourse?.title }}</h1>
                         <p class="text-xl mb-6">{{ currentCourse?.description }}</p>
                         <div class="flex items-center space-x-4" v-if="courseInstructor">
-                            <img :src="courseInstructor.avatar" :alt="courseInstructor.firstName"
-                                class="w-12 h-12 rounded-full">
+                            <img :src="'http://localhost:8092/backend' + courseInstructor.avatar"
+                                :alt="courseInstructor.firstName" class="w-12 h-12 rounded-full">
                             <div>
                                 <p class="font-medium">{{ courseInstructor.firstName + " " + courseInstructor.lastName
                                     }}</p>
@@ -86,7 +86,7 @@
                                 <span class="text-3xl font-bold text-blue-600">{{ formatPrice(currentCourse?.price)
                                     }}</span>
                             </div>
-                            <button
+                            <button @click="proceedToCheckout"
                                 class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors mb-4">
                                 Đăng ký ngay
                             </button>
@@ -126,16 +126,18 @@
 
 <script setup>
 import { ref, computed, onBeforeMount } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import instructors from '@/faker/instructors'
 
 import courses from '@/faker/course'
 import DefaultLayout from '@/layouts/user/DefaultLayout.vue'
 import courseServices from '@/services/courseServices'
 import lectureServices from '@/services/lectureServices'
+import { useOrderStore } from '@/stores/order'
 
 const route = useRoute()
-
+const orderStore = useOrderStore();
+const router = useRouter();
 const courseId = route.query.course
 const lectures = ref([])
 const currentCourse = ref({})
@@ -192,4 +194,9 @@ const formatPrice = (price) => {
         currency: 'VND'
     }).format(price)
 }
+const proceedToCheckout = () => {
+    console.log("Proceeding to checkout with items:", currentCourse);
+    orderStore.addItem(currentCourse);
+    router.push("/checkout");
+};
 </script>

@@ -391,7 +391,8 @@ const handleFileUpload = (event) => {
       // Process data according to new format
       const formattedData = dataRows
         .map((row) => {
-          const quiz = row[0];
+          const quiz = String(row[0]);
+          
           const question = row[1];
           // Get answers from columns C to F (or until empty cell)
           const answers = row
@@ -420,13 +421,14 @@ const handleFileUpload = (event) => {
 };
 
 const findCorrectAnswer = (answers) => {
-  console.log(answers);
   const correctAnswer = answers.find((answer) => answer.is_correct);
+
   return correctAnswer ? correctAnswer.answer_text : "";
 };
 
 const findQuiz = (name) => {
   const quiz = quizzes.value.find((ele) => ele.name === name);
+
   return quiz ? quiz.id : "";
 };
 
@@ -436,6 +438,7 @@ const confirmImport = async () => {
   await Promise.all(
     previewExcel.value.map(async (item) => {
       try {
+
         const questionRes = await questionServices.create({
           question_text: item.question,
           quiz: findQuiz(item.quiz),
@@ -475,9 +478,7 @@ const confirmImport = async () => {
   const importedQuizzes = Object.values(quizGroups);
 
   importedQuizzes.forEach((importedQuiz) => {
-    const existingQuiz = quizzes.value.find(
-      (q) => q.name === importedQuiz.name
-    );
+    const existingQuiz = quizzes.value.find((q) => q.name === importedQuiz.name);
 
     if (existingQuiz) {
       existingQuiz.questions.push(...importedQuiz.questions);
@@ -658,7 +659,6 @@ onBeforeMount(async () => {
         answerServices.gets(),
       ]);
     const quizData = quizzesResponse.data.data;
-
 
     if (answersResponse.status !== 204 && questionsResponse.status !== 204) {
       const questions = [...questionsResponse.data.data];

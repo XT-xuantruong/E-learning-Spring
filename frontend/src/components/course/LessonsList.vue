@@ -74,7 +74,7 @@ const isLessonCompleted = (index) => {
     return index <= props.completedLessons;
 };
 const isQuizCompleted = (quizId) => {
-    return props.quizResultList.some(result => result.quiz.id === quizId);
+    return props.quizResultList.some(result => result.quiz.id == quizId);
 };
 
 const handleLessonClick = (index) => {

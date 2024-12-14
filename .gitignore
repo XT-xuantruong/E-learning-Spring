@@ -2,3 +2,7 @@
 Servers
 backend/src/main/webapp/WEB-INF/e-learning-servlet.xml
 frontend/.env
+.idea
+backend/.smarttomcat
+.vscode
+backend/src/main/webapp/resources

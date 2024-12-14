@@ -49,18 +49,6 @@ ADD COLUMN price FLOAT NOT NULL DEFAULT 0.0;
 ALTER TABLE quiz_result 
 ADD COLUMN user_id VARCHAR(36) NOT NULL;
 
--- Add foreign key constraint
-ALTER TABLE quiz_result
-ADD CONSTRAINT fk_quiz_result_user
-FOREIGN KEY (user_id) REFERENCES users(id);
-select * from category where slug = "react-js"; 
-ALTER TABLE course_enrollment 
-ADD CONSTRAINT unique_user_course UNIQUE (user_id, course_id);
-ALTER TABLE course_enrollment DROP INDEX unique_user_course;
-SELECT * 
-FROM course_enrollment 
-WHERE user_id = '3da4028f-e361-42f3-ad0a-019610dbd1ec' 
-  AND course_id = '0dd67f4b-e737-45f3-97d8-454f47774881';
 CREATE TABLE course_enrollment (
     id VARCHAR(36) PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
